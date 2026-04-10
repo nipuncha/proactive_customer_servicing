@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AusBank — Contact Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0B1929;--s1:#0F1F33;--s2:#132840;--s3:#1A3350;
+  --gold:#C9933A;--gold-lt:#E8B560;--gold-bdr:rgba(201,147,58,.2);
+  --red:#E05252;--red-bg:rgba(224,82,82,.1);--red-bdr:rgba(224,82,82,.3);
+  --green:#3DB87A;--green-bg:rgba(61,184,122,.1);--green-bdr:rgba(61,184,122,.25);
+  --amber:#E8A535;--amber-bg:rgba(232,165,53,.1);--amber-bdr:rgba(232,165,53,.25);
+  --blue:#4A9FE8;--blue-bg:rgba(74,159,232,.1);--blue-bdr:rgba(74,159,232,.25);
+  --purple:#9B72E8;
+  --t1:#E8EDF2;--t2:#8AA4BF;--t3:#4A6880;
+  --ln:rgba(255,255,255,.06);--ln2:rgba(255,255,255,.11);
+  --r:6px;--r2:10px;--font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:var(--font);color:var(--t1);font-size:13px;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px;}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
+.lgrid{position:absolute;inset:0;background-image:linear-gradient(var(--ln) 1px,transparent 1px),linear-gradient(90deg,var(--ln) 1px,transparent 1px);background-size:48px 48px;}
+.lglow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(201,147,58,.07),transparent 65%);}
+.lcard{position:relative;width:400px;background:var(--s1);border:1px solid var(--ln2);border-radius:16px;padding:36px 40px;box-shadow:0 32px 64px rgba(0,0,0,.45);}
+.llogo{display:flex;align-items:center;gap:11px;margin-bottom:28px;}
+.lmark{width:42px;height:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.lmark svg{width:24px;height:24px;}
+.lbrand{font-size:20px;font-weight:800;letter-spacing:-.3px;}
+.lsub{font-size:9px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.ltitle{font-size:17px;font-weight:700;margin-bottom:4px;}
+.lhint{font-size:11px;color:var(--t2);margin-bottom:22px;line-height:1.5;}
+.lerr{background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red);border-radius:5px;padding:7px 11px;font-size:11px;margin-bottom:12px;display:none;}
+.lfield{margin-bottom:13px;}
+.lfield label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);display:block;margin-bottom:5px;font-weight:600;}
+.lfield input{width:100%;background:var(--s2);border:1px solid var(--ln2);border-radius:var(--r);padding:9px 12px;color:var(--t1);font-family:var(--font);font-size:13px;outline:none;transition:border-color .18s;}
+.lfield input:focus{border-color:var(--gold);}
+.lfield input::placeholder{color:var(--t3);}
+.lbtn{width:100%;background:var(--gold);border:none;border-radius:var(--r);padding:11px;color:var(--bg);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:background .18s;margin-top:4px;}
+.lbtn:hover{background:var(--gold-lt);}
+.lfooter{text-align:center;margin-top:16px;font-size:11px;color:var(--t3);}
+.lfooter span{color:var(--gold);cursor:pointer;}
+
+/* APP */
+#app{display:none;height:100vh;flex-direction:column;}
+#app.on{display:flex;}
+
+/* TOPBAR */
+.bar{height:46px;background:var(--s1);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 14px;gap:0;flex-shrink:0;z-index:10;}
+.bmark{width:26px;height:26px;background:var(--gold);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:8px;}
+.bmark svg{width:15px;height:15px;}
+.bname{font-size:13px;font-weight:800;letter-spacing:-.2px;margin-right:14px;}
+.seg{display:flex;background:var(--s2);border-radius:6px;padding:2px;gap:2px;margin-right:auto;}
+.sbb{padding:4px 12px;border-radius:4px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:transparent;font-family:var(--font);display:flex;align-items:center;gap:5px;transition:all .18s;white-space:nowrap;}
+.sbb:hover{color:var(--t2);}
+.sbb.on{background:var(--s3);color:var(--gold-lt);}
+.seg-chip{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;}
+.seg-chip.live{background:var(--red-bg);color:var(--red);}
+.seg-chip.warn{background:var(--amber-bg);color:var(--amber);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.ctx{display:flex;align-items:center;gap:7px;padding:3px 10px;border-radius:5px;background:var(--red-bg);border:1px solid var(--red-bdr);margin:0 12px;}
+.ctx-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1.2s infinite;}
+.ctx-name{font-size:11px;font-weight:600;}
+.ctx-timer{font-family:var(--mono);font-size:11px;color:var(--t2);}
+.ctx-sep{color:var(--t3);}
+.ctx-id{font-size:10px;color:var(--t3);font-family:var(--mono);}
+.bright{display:flex;align-items:center;gap:7px;}
+.bq{font-size:11px;color:var(--amber);font-weight:600;cursor:pointer;opacity:.75;transition:opacity .15s;}
+.bq:hover{opacity:1;}
+.bibtn{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--t2);transition:all .15s;}
+.bibtn:hover{background:var(--s2);color:var(--t1);}
+.bclk{font-family:var(--mono);font-size:11px;color:var(--t3);}
+.bagent{display:flex;align-items:center;gap:5px;padding:3px 9px;background:var(--s2);border-radius:20px;cursor:pointer;border:1px solid var(--ln);}
+.bagent:hover{border-color:var(--ln2);}
+.bav{width:20px;height:20px;border-radius:50%;background:var(--s3);border:1.5px solid var(--gold-bdr);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--gold);}
+.ban{font-size:11px;font-weight:600;}
+.odot{width:5px;height:5px;border-radius:50%;background:var(--green);}
+
+/* VIEWS */
+.view{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.view.on{display:flex;}
+
+/* DIGITAL ACCESS */
+.ws{display:grid;grid-template-columns:248px 1fr 264px;height:100%;overflow:hidden;}
+.lp{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--ln);}
+.lph{padding:10px 13px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--s1);}
+.lpht{font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t3);font-weight:600;}
+.lpb{flex:1;overflow-y:auto;padding:13px;background:var(--bg);}
+.cident{display:flex;align-items:center;gap:9px;margin-bottom:13px;padding-bottom:13px;border-bottom:1px solid var(--ln);}
+.cav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--s3),#1E3A5A);border:1.5px solid var(--gold-bdr);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--gold-lt);flex-shrink:0;}
+.cname{font-size:14px;font-weight:700;line-height:1.2;}
+.csub{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:1px;}
+.rchip{margin-left:auto;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red);flex-shrink:0;}
+.rrisk{display:flex;align-items:center;gap:9px;margin-bottom:13px;padding-bottom:13px;border-bottom:1px solid var(--ln);}
+.rlbl{font-size:10px;color:var(--t3);}
+.rtrack{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.rfill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--amber),var(--red));transition:width .5s;}
+.rnum{font-size:11px;font-weight:700;color:var(--red);font-family:var(--mono);}
+.si3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.si3c{background:var(--s1);padding:8px 5px;text-align:center;}
+.si3n{font-size:18px;font-weight:700;font-family:var(--mono);line-height:1;}
+.si3l{font-size:9px;color:var(--t3);margin-top:2px;}
+.si3c.d .si3n{color:var(--red);}
+.si3c.w .si3n{color:var(--amber);}
+.si3c.i .si3n{color:var(--blue);}
+.slbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:7px;}
+.kvl{display:flex;flex-direction:column;margin-bottom:14px;}
+.kv{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--ln);}
+.kv:last-child{border-bottom:none;}
+.kk{font-size:10px;color:var(--t3);}
+.kvv{font-size:11px;font-weight:500;text-align:right;}
+.kvv.w{color:var(--amber);}
+.tl{display:flex;flex-direction:column;}
+.tli{display:flex;gap:7px;padding:4px 0;position:relative;}
+.tli::before{content:'';position:absolute;left:7px;top:20px;bottom:-4px;width:1px;background:var(--ln);}
+.tli:last-child::before{display:none;}
+.tlid{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:7px;margin-top:1px;}
+.tlid.f{background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red);}
+.tlid.w{background:var(--amber-bg);border:1px solid var(--amber-bdr);color:var(--amber);}
+.tlid.i{background:var(--blue-bg);border:1px solid var(--blue-bdr);color:var(--blue);}
+.tlid.ok{background:var(--green-bg);border:1px solid var(--green-bdr);color:var(--green);}
+.tlit{font-size:11px;font-weight:600;color:var(--t1);line-height:1.3;}
+.tlim{font-size:10px;color:var(--t3);margin-top:1px;font-family:var(--mono);}
+.tlip{display:inline-block;font-size:9px;padding:1px 5px;border-radius:3px;margin-top:2px;font-weight:700;}
+.tlip.live{background:var(--red-bg);color:var(--red);animation:blink 1.5s infinite;}
+.tlip.nd{background:var(--blue-bg);color:var(--blue);}
+.tlip.ok{background:var(--green-bg);color:var(--green);}
+
+/* CENTRE */
+.cp{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);flex:1;}
+.astrip{background:rgba(224,82,82,.07);border-bottom:1px solid rgba(224,82,82,.18);padding:5px 14px;display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.asdot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;animation:blink 1.2s infinite;}
+.astxt{font-size:11px;color:rgba(240,160,160,.85);flex:1;line-height:1.3;}
+.astxt strong{color:var(--red);}
+.tabs{display:flex;border-bottom:1px solid var(--ln);flex-shrink:0;background:var(--s1);padding:0 14px;}
+.tab{padding:8px 11px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;font-weight:600;user-select:none;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tab:hover:not(.on){color:var(--t2);}
+.tpane{display:none;flex:1;overflow-y:auto;padding:12px 14px;}
+.tpane.on{display:block;}
+/* Event cards */
+.ev{background:var(--s1);border-radius:var(--r);padding:9px 11px;margin-bottom:5px;display:flex;gap:8px;cursor:pointer;transition:background .15s;border:1px solid transparent;}
+.ev:hover{background:var(--s2);}
+.ev.crit{border-color:rgba(224,82,82,.15);background:rgba(26,8,8,.45);}
+.ev.warn{border-color:rgba(232,165,53,.12);background:rgba(26,18,0,.35);}
+.ev.suc{border-color:rgba(61,184,122,.12);background:rgba(7,24,16,.35);}
+.ev.inf{border-color:rgba(74,159,232,.1);}
+.ev.new{animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+.evdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.evdot.crit{background:var(--red);}
+.evdot.warn{background:var(--amber);}
+.evdot.suc{background:var(--green);}
+.evdot.inf{background:var(--blue);}
+.evdot.ag{background:var(--purple);}
+.evm{flex:1;min-width:0;}
+.evh{display:flex;align-items:baseline;gap:7px;margin-bottom:2px;}
+.evn{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--t1);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.evt{font-family:var(--mono);font-size:10px;color:var(--t3);flex-shrink:0;}
+.evd{font-size:11px;color:var(--t2);line-height:1.4;}
+.evdata{display:none;margin-top:5px;background:var(--bg);border-radius:3px;padding:4px 7px;font-family:var(--mono);font-size:10px;color:var(--t3);line-height:1.7;}
+.evdata span{color:var(--gold-lt);}
+.ev.expanded .evdata{display:block;}
+/* Device */
+.dcard{background:var(--s1);border:1px solid var(--ln);border-radius:var(--r2);padding:11px 13px;margin-bottom:7px;}
+.dch{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.dico{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.dnam{font-size:12px;font-weight:700;}
+.dsub{font-size:10px;color:var(--t3);margin-top:1px;}
+.dbadge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.dbadge.trusted{background:var(--green-bg);border:1px solid var(--green-bdr);color:var(--green);}
+.dbadge.unknown{background:var(--amber-bg);border:1px solid var(--amber-bdr);color:var(--amber);}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;}
+.dfl label{font-size:9px;color:var(--t3);display:block;margin-bottom:1px;text-transform:uppercase;letter-spacing:.4px;}
+.dfl span{font-size:10px;color:var(--t1);font-family:var(--mono);}
+/* Call history */
+.chr{padding:8px 0;border-bottom:1px solid var(--ln);}
+.chr:last-child{border-bottom:none;}
+.chrm{display:flex;align-items:center;gap:7px;margin-bottom:2px;}
+.chrd{font-size:10px;color:var(--t3);font-family:var(--mono);}
+.chro{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;}
+.chro.res{background:var(--green-bg);color:var(--green);}
+.chro.esc{background:var(--amber-bg);color:var(--amber);}
+.chrdur{font-size:10px;color:var(--t3);font-family:var(--mono);margin-left:auto;}
+.chrr{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:1px;}
+.chrn{font-size:10px;color:var(--t3);line-height:1.4;}
+/* Note bar */
+.nb{padding:9px 14px;border-top:1px solid var(--ln);background:var(--s1);flex-shrink:0;}
+.nbr{display:flex;gap:6px;margin-bottom:5px;}
+.ninput{flex:1;background:var(--s2);border:1px solid var(--ln2);border-radius:var(--r);padding:6px 10px;color:var(--t1);font-family:var(--font);font-size:12px;outline:none;transition:border-color .18s;}
+.ninput:focus{border-color:var(--gold-bdr);}
+.ninput::placeholder{color:var(--t3);}
+.nsend{background:var(--gold);border:none;border-radius:var(--r);padding:6px 13px;color:var(--bg);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.nsend:hover{background:var(--gold-lt);}
+.chips{display:flex;gap:4px;flex-wrap:wrap;}
+.chip{background:var(--s2);border:1px solid var(--ln);border-radius:20px;padding:3px 8px;font-size:10px;color:var(--t3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.chip:hover{border-color:var(--gold-bdr);color:var(--gold-lt);}
+
+/* RIGHT PANEL */
+.rp{display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--ln);}
+.rph{padding:9px 13px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--s1);}
+.rpb{flex:1;overflow-y:auto;padding:11px 13px;background:var(--bg);}
+/* Actions checklist */
+.acl{display:flex;flex-direction:column;gap:1px;background:var(--ln);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.aci{background:var(--s1);padding:8px 10px;display:flex;align-items:flex-start;gap:8px;cursor:pointer;transition:background .15s;}
+.aci:hover{background:var(--s2);}
+.aci.done{opacity:.35;pointer-events:none;}
+.ack{width:15px;height:15px;border-radius:4px;border:1.5px solid;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .2s;}
+.ack.h{border-color:var(--red);color:var(--red);}
+.ack.m{border-color:var(--amber);color:var(--amber);}
+.ack.l{border-color:var(--blue);color:var(--blue);}
+.ack.x{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.act{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:1px;}
+.acd{font-size:10px;color:var(--t3);line-height:1.4;}
+/* Sentiment */
+.sblk{margin-bottom:14px;}
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.slb{font-size:10px;color:var(--t2);width:68px;flex-shrink:0;}
+.str{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.sfl{height:100%;border-radius:2px;}
+.sva{font-size:10px;font-weight:600;width:40px;text-align:right;flex-shrink:0;}
+.stip{font-size:10px;color:var(--t3);line-height:1.4;padding:6px 9px;background:var(--s2);border-radius:4px;border-left:2px solid var(--blue-bdr);}
+/* Channel chips */
+.csr{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;}
+.csc{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid;}
+.csc.lk{background:var(--red-bg);border-color:var(--red-bdr);color:var(--red);}
+.csc.ac{background:var(--green-bg);border-color:var(--green-bdr);color:var(--green);}
+.csc.op{background:var(--blue-bg);border-color:var(--blue-bdr);color:var(--blue);}
+.cscd{width:4px;height:4px;border-radius:50%;background:currentColor;}
+/* KB */
+.kbb{width:100%;background:transparent;border:1px solid var(--ln);border-radius:var(--r);padding:7px 10px;color:var(--t2);font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;transition:all .15s;}
+.kbb:hover{background:var(--s2);color:var(--t1);}
+.kbc{display:none;background:var(--s2);border-radius:var(--r);padding:9px 11px;margin-bottom:7px;border-left:2px solid var(--blue-bdr);}
+.kbc.on{display:block;}
+.kbc li{font-size:10px;color:var(--t2);padding:3px 0 3px 13px;position:relative;line-height:1.5;border-bottom:1px solid var(--ln);}
+.kbc li:last-child{border-bottom:none;}
+.kbc li::before{content:counter(kb);counter-increment:kb;position:absolute;left:0;top:4px;font-size:9px;color:var(--gold);font-weight:700;}
+.kbc ol{list-style:none;counter-reset:kb;}
+.kbc.fraud{border-left-color:var(--amber-bdr);}
+
+/* PAYMENT VIEW */
+.pv{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.pvalert{background:rgba(224,82,82,.07);border-bottom:1px solid rgba(224,82,82,.18);padding:7px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pvalert.hidden{display:none;}
+.pval{display:flex;align-items:center;gap:9px;}
+.pvai{width:24px;height:24px;background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.pvat{font-size:12px;font-weight:700;color:#ff8a88;}
+.pvas{font-size:11px;color:var(--t2);}
+.pvcon{background:var(--red);color:#fff;border:none;border-radius:var(--r);padding:6px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.pvcon:hover{opacity:.85;}
+.pvlay{display:grid;grid-template-columns:292px 1fr;flex:1;overflow:hidden;}
+.pvlist{background:var(--s1);border-right:1px solid var(--ln);display:flex;flex-direction:column;overflow:hidden;}
+.pvlh{padding:10px 15px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pvlt{font-size:9px;text-transform:uppercase;letter-spacing:1.8px;color:var(--t3);font-weight:600;}
+.pvlb{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-bdr);}
+.pvcards{overflow-y:auto;flex:1;padding:6px;}
+.pac{border-radius:var(--r);padding:9px 10px;cursor:pointer;transition:background .15s;border-left:3px solid transparent;margin-bottom:1px;}
+.pac.crit{border-left-color:var(--red);}
+.pac.warning{border-left-color:var(--amber);}
+.pac.info{border-left-color:var(--blue);}
+.pac.on,.pac:hover{background:var(--s2);}
+.pac.on{border-left-color:var(--gold)!important;}
+.pac.res{opacity:.4;}
+.pact{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.pav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.pav.r{background:rgba(224,82,82,.15);border:1.5px solid rgba(224,82,82,.35);color:#ff8a88;}
+.pav.a{background:rgba(232,165,53,.12);border:1.5px solid rgba(232,165,53,.3);color:var(--amber);}
+.pav.b{background:rgba(74,159,232,.12);border:1.5px solid rgba(74,159,232,.25);color:var(--blue);}
+.pacn{font-size:12px;font-weight:600;line-height:1.2;}
+.paca{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:1px;}
+.pacf{margin-left:auto;text-align:right;}
+.pacfn{font-family:var(--mono);font-size:16px;font-weight:700;line-height:1;}
+.pacfn.r{color:var(--red);}
+.pacfn.a{color:var(--amber);}
+.pacfl{font-size:9px;color:var(--t3);}
+.pacm{display:flex;gap:5px;flex-wrap:wrap;}
+.pacc{font-size:10px;color:var(--t3);background:rgba(255,255,255,.03);border-radius:3px;padding:1px 5px;font-family:var(--mono);}
+/* Detail */
+.pvd{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.pvdh{padding:14px 20px 11px;border-bottom:1px solid var(--ln);flex-shrink:0;background:var(--s1);}
+.pvdht{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+.pvdc{display:flex;align-items:center;gap:11px;}
+.pvda{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
+.pvdn{font-size:18px;font-weight:700;letter-spacing:-.2px;}
+.pvds{font-size:11px;color:var(--t2);margin-top:2px;}
+.pvdac{display:flex;gap:6px;flex-wrap:wrap;}
+.pb{border-radius:var(--r);padding:6px 13px;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;}
+.pbg{background:transparent;color:var(--t2);border-color:var(--ln);}
+.pbg:hover{background:var(--s2);color:var(--t1);border-color:var(--ln2);}
+.pbp{background:var(--blue);color:#fff;border-color:transparent;}
+.pbp:hover{opacity:.88;}
+.pbc{background:var(--green);color:#fff;border-color:transparent;}
+.pbc:hover{opacity:.88;}
+.pbe{background:var(--red-bg);color:var(--red);border-color:var(--red-bdr);}
+.pbe:hover{background:rgba(224,82,82,.18);}
+.pvss{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.pvst{background:var(--s2);border:1px solid var(--ln);border-radius:var(--r);padding:9px 11px;}
+.pvsl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.pvsv{font-family:var(--mono);font-size:17px;font-weight:500;}
+.pvsv.red{color:var(--red);}
+.pvsv.amber{color:var(--amber);}
+.pvsb{font-size:10px;color:var(--t3);margin-top:1px;}
+.pvdb{flex:1;overflow-y:auto;padding:14px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;}
+.pvsc{background:var(--s1);border:1px solid var(--ln);border-radius:var(--r2);padding:13px 15px;}
+.pvsc.full{grid-column:1/-1;}
+.pvscl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:11px;}
+.pvig{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;}
+.pvir{display:flex;flex-direction:column;gap:2px;}
+.pvik{font-size:10px;color:var(--t3);}
+.pviv{font-size:12px;font-weight:500;}
+.pviv.mono{font-family:var(--mono);font-size:11px;}
+.pviv.red{color:var(--red);}
+.cardv{background:linear-gradient(135deg,#1a3060,#0f2040);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px;aspect-ratio:1.586;position:relative;overflow:hidden;margin-bottom:10px;}
+.cardv::before{content:'';position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:rgba(201,147,58,.07);}
+.cnet{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
+.cnum{font-family:var(--mono);font-size:13px;letter-spacing:2px;margin-top:15px;color:rgba(255,255,255,.8);}
+.cbot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;}
+.chold{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.celb{font-size:8px;color:rgba(255,255,255,.35);letter-spacing:.5px;}
+.cel{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.6);}
+.ptl{display:flex;flex-direction:column;}
+.ptli{display:grid;grid-template-columns:48px 12px 1fr;gap:0 9px;align-items:start;padding-bottom:11px;}
+.ptli:last-child{padding-bottom:0;}
+.ptlt{font-family:var(--mono);font-size:10px;color:var(--t3);text-align:right;padding-top:2px;}
+.ptldc{display:flex;flex-direction:column;align-items:center;}
+.ptld{width:11px;height:11px;border-radius:50%;border:2px solid;flex-shrink:0;margin-top:2px;}
+.ptld.fail{border-color:var(--red);background:var(--red-bg);}
+.ptld.ok{border-color:var(--green);background:var(--green-bg);}
+.ptll{flex:1;width:1px;background:var(--ln);margin-top:2px;min-height:14px;}
+.ptli:last-child .ptll{display:none;}
+.ptltit{font-size:12px;font-weight:500;margin-bottom:2px;}
+.ptltit.fail{color:var(--red);}
+.ptltit.ok{color:var(--green);}
+.ptlch{display:flex;gap:5px;flex-wrap:wrap;}
+.ptlc{font-size:10px;font-family:var(--mono);padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.04);color:var(--t2);border:1px solid var(--ln);}
+.ptlc.err{background:var(--red-bg);color:var(--red);border-color:var(--red-bdr);}
+.sbox{background:rgba(59,139,212,.06);border:1px solid rgba(59,139,212,.18);border-radius:var(--r);padding:10px 12px;font-size:12px;line-height:1.6;color:var(--t2);margin-bottom:9px;font-style:italic;grid-column:1/-1;}
+.sbox strong{color:var(--t1);font-style:normal;}
+.slbl2{font-size:10px;color:var(--blue);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.sacts{display:flex;gap:6px;flex-wrap:wrap;}
+.pvstb{background:var(--s1);border-top:1px solid var(--ln);padding:5px 18px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--t3);flex-shrink:0;}
+.pvsitm{display:flex;gap:14px;}
+.sdot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:3px;}
+.sdot.g{background:var(--green);}
+.sdot.r{background:var(--red);animation:blink 1.2s infinite;}
+
+/* MODAL */
+.mov{position:fixed;inset:0;background:rgba(5,10,20,.8);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;}
+.mov.on{opacity:1;pointer-events:all;}
+.mbox{background:var(--s1);border:1px solid var(--ln2);border-radius:12px;padding:24px;width:380px;max-width:90vw;transform:translateY(7px) scale(.97);transition:transform .2s;}
+.mov.on .mbox{transform:none;}
+.mic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:19px;}
+.mic.g{background:var(--green-bg);border:1.5px solid var(--green-bdr);}
+.mic.b{background:var(--blue-bg);border:1.5px solid var(--blue-bdr);}
+.mic.red{background:var(--red-bg);border:1.5px solid var(--red-bdr);}
+.mt{font-size:16px;font-weight:700;text-align:center;margin-bottom:6px;}
+.mb{font-size:13px;color:var(--t2);text-align:center;line-height:1.6;margin-bottom:20px;}
+.mac{display:flex;gap:8px;justify-content:center;}
+.mcan{background:transparent;border:1px solid var(--ln2);color:var(--t2);border-radius:var(--r);padding:8px 20px;font-family:var(--font);font-size:13px;cursor:pointer;}
+.mcan:hover{background:var(--s2);}
+.mcon{border:none;border-radius:var(--r);padding:8px 20px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;color:#fff;}
+.mcon.g{background:var(--green);}
+.mcon.b{background:#3b8bd4;}
+.mcon.red{background:var(--red);}
+
+/* TOAST */
+.toast{position:fixed;bottom:16px;right:16px;background:var(--s2);border:1px solid var(--ln2);border-radius:9px;padding:11px 15px;max-width:280px;z-index:600;transform:translateY(14px);opacity:0;transition:all .25s;box-shadow:0 5px 20px rgba(0,0,0,.4);}
+.toast.on{transform:translateY(0);opacity:1;}
+.toast.g{border-color:var(--green-bdr);}
+.toast.b{border-color:var(--blue-bdr);}
+.toast.red{border-color:var(--red-bdr);}
+.toast.amber{border-color:var(--amber-bdr);}
+.tico{font-size:15px;display:block;margin-bottom:4px;}
+.tit{font-weight:700;font-size:12px;margin-bottom:2px;}
+.tib{color:var(--t2);font-size:11px;}
+
+/* ── SENTIMENT / SUMMARY PANEL ─────────────────── */
+/* Right panel tab system */
+.rp-tabs{display:flex;border-bottom:1px solid var(--ln);flex-shrink:0;background:var(--s1);}
+.rp-tab{flex:1;padding:8px 0;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;font-weight:700;text-align:center;user-select:none;}
+.rp-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.rp-tab:hover:not(.on){color:var(--t2);}
+.rp-pane{display:none;flex:1;overflow-y:auto;padding:11px 13px;background:var(--bg);}
+.rp-pane.on{display:block;}
+
+/* Sentiment journey track */
+.sj-wrap{margin-bottom:16px;}
+.sj-track{position:relative;margin:16px 0 8px;}
+.sj-line{position:absolute;top:9px;left:10px;right:10px;height:2px;background:var(--ln);z-index:0;}
+.sj-fill{position:absolute;top:9px;left:10px;height:2px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));z-index:1;transition:width 1.2s ease;}
+.sj-nodes{display:flex;justify-content:space-between;position:relative;z-index:2;}
+.sj-node{display:flex;flex-direction:column;align-items:center;gap:5px;width:44px;}
+.sj-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--ln2);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .6s ease;cursor:default;}
+.sj-dot.reached{box-shadow:0 0 0 3px rgba(255,255,255,.06);}
+.sj-dot.distressed.reached{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.sj-dot.frustrated.reached{border-color:var(--amber);background:var(--amber-bg);color:var(--amber);}
+.sj-dot.cautious.reached{border-color:#7AA0C4;background:rgba(122,160,196,.12);color:#7AA0C4;}
+.sj-dot.relieved.reached{border-color:#59C4A4;background:rgba(89,196,164,.12);color:#59C4A4;}
+.sj-dot.satisfied.reached{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.sj-dot.current{animation:dot-pulse 1.5s ease-in-out infinite;}
+@keyframes dot-pulse{0%,100%{box-shadow:0 0 0 3px rgba(255,255,255,.06)}50%{box-shadow:0 0 0 5px rgba(255,255,255,.1)}}
+.sj-lbl{font-size:8.5px;color:var(--t3);text-align:center;line-height:1.2;}
+.sj-lbl.reached{color:var(--t2);}
+.sj-time{font-size:8px;color:var(--t3);font-family:var(--mono);}
+
+/* Live tone bars */
+.tone-grid{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.tone-row{display:flex;align-items:center;gap:8px;}
+.tone-lbl{font-size:10px;color:var(--t2);width:72px;flex-shrink:0;}
+.tone-track{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.tone-fill{height:100%;border-radius:2px;transition:width 1.2s ease;}
+.tone-val{font-size:10px;font-weight:600;width:32px;text-align:right;flex-shrink:0;}
+.tone-tip{font-size:10px;color:var(--t3);padding:6px 9px;background:var(--s2);border-radius:4px;border-left:2px solid var(--blue-bdr);line-height:1.5;margin-top:4px;}
+
+/* AI Summary section */
+.sum-gen-btn{width:100%;background:transparent;border:1px solid var(--gold-bdr);border-radius:var(--r);padding:9px 14px;color:var(--gold-lt);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;margin-bottom:10px;letter-spacing:.3px;}
+.sum-gen-btn:hover:not(:disabled){background:rgba(201,147,58,.07);border-color:var(--gold);}
+.sum-gen-btn:disabled{opacity:.45;cursor:default;}
+.sum-gen-btn .spin{animation:spin .8s linear infinite;display:inline-block;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Summary output */
+.sum-out{background:var(--s1);border:1px solid var(--ln);border-radius:var(--r2);overflow:hidden;}
+.sum-header{padding:12px 14px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;}
+.sum-title-row{display:flex;align-items:center;gap:8px;}
+.sum-overall{font-size:12px;font-weight:700;}
+.sum-csat{display:flex;align-items:baseline;gap:3px;}
+.sum-csat-n{font-size:16px;font-weight:800;color:var(--green);}
+.sum-csat-d{font-size:10px;color:var(--t3);}
+.sum-stars{font-size:12px;letter-spacing:1px;}
+.sum-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.sum-section{border-bottom:1px solid var(--ln);padding-bottom:10px;}
+.sum-section:last-child{border-bottom:none;padding-bottom:0;}
+.sum-sec-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);font-weight:700;margin-bottom:5px;}
+.sum-text{font-size:11px;color:var(--t2);line-height:1.65;}
+.sum-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.sum-chip{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;border:1px solid;}
+.sum-chip.neg{background:var(--red-bg);border-color:var(--red-bdr);color:var(--red);}
+.sum-chip.pos{background:var(--green-bg);border-color:var(--green-bdr);color:var(--green);}
+.sum-chip.neu{background:var(--blue-bg);border-color:var(--blue-bdr);color:var(--blue);}
+.sum-chip.warn{background:var(--amber-bg);border-color:var(--amber-bdr);color:var(--amber);}
+/* Metric row */
+.sum-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.sum-metric{background:var(--s2);border-radius:var(--r);padding:7px 9px;}
+.sum-metric-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3);margin-bottom:2px;}
+.sum-metric-val{font-size:12px;font-weight:700;}
+.sum-metric-val.green{color:var(--green);}
+.sum-metric-val.amber{color:var(--amber);}
+.sum-metric-val.red{color:var(--red);}
+/* CRM actions */
+.sum-actions{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--ln);background:var(--s1);}
+.sum-act-btn{flex:1;background:transparent;border:1px solid var(--ln2);border-radius:var(--r);padding:7px 0;font-family:var(--font);font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .15s;text-align:center;}
+.sum-act-btn:hover{background:var(--s2);color:var(--t1);border-color:var(--ln2);}
+.sum-act-btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.sum-act-btn.primary:hover{background:var(--gold-lt);}
+/* Empty state */
+.sum-empty{text-align:center;padding:24px 16px;color:var(--t3);}
+.sum-empty-icon{font-size:28px;margin-bottom:8px;opacity:.5;}
+.sum-empty-text{font-size:11px;line-height:1.5;}
+
+/* Sentence-by-sentence transcript input area */
+.tx-area{background:var(--s2);border:1px solid var(--ln2);border-radius:var(--r);overflow:hidden;margin-bottom:10px;}
+.tx-msgs{min-height:60px;max-height:120px;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px;}
+.tx-msg{font-size:11px;line-height:1.45;padding:4px 8px;border-radius:4px;}
+.tx-msg.agent{background:rgba(201,147,58,.08);color:var(--t1);border-left:2px solid var(--gold-bdr);}
+.tx-msg.customer{background:rgba(74,159,232,.06);color:var(--t2);border-left:2px solid var(--blue-bdr);}
+.tx-input-row{display:flex;gap:0;border-top:1px solid var(--ln);}
+.tx-who{background:transparent;border:none;border-right:1px solid var(--ln);padding:6px 8px;font-family:var(--font);font-size:10px;color:var(--t3);cursor:pointer;outline:none;min-width:70px;}
+.tx-who:focus{color:var(--t2);}
+.tx-inp{flex:1;background:transparent;border:none;padding:6px 9px;font-family:var(--font);font-size:11px;color:var(--t1);outline:none;}
+.tx-inp::placeholder{color:var(--t3);}
+.tx-add{background:transparent;border:none;border-left:1px solid var(--ln);padding:6px 10px;color:var(--t3);cursor:pointer;font-size:12px;transition:color .15s;}
+.tx-add:hover{color:var(--gold);}
+
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="lgrid"></div><div class="lglow"></div>
+  <div class="lcard">
+    <div class="llogo">
+      <div class="lmark"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L25 8.5V19.5L14 25L3 19.5V8.5L14 3Z" fill="#0B1929"/><path d="M14 8L21 11.5V17.5L14 21L7 17.5V11.5L14 8Z" fill="#C9933A"/><path d="M14 11L18 13V17L14 19L10 17V13L14 11Z" fill="#0B1929"/></svg></div>
+      <div><div class="lbrand">AusBank</div><div class="lsub">Contact Centre</div></div>
+    </div>
+    <div class="ltitle">Sign in</div>
+    <div class="lhint">Access Digital Access and Payment Monitoring from one workspace.</div>
+    <div class="lerr" id="lErr">Incorrect — try agent@ausbank.com.au / agent123</div>
+    <div class="lfield"><label>Email</label><input type="email" id="lEmail" value="agent@ausbank.com.au" placeholder="agent@ausbank.com.au"/></div>
+    <div class="lfield"><label>Password</label><input type="password" id="lPass" value="agent123" placeholder="••••••••"/></div>
+    <button class="lbtn" onclick="doLogin()">Sign in to workspace</button>
+    <div class="lfooter">AusBank Group © 2025 · <span onclick="showT('📧','b','IT Support','itsupport@ausbank.com.au')">IT Support</span></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="bar">
+    <div class="bmark"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L25 8.5V19.5L14 25L3 19.5V8.5L14 3Z" fill="#0B1929"/><path d="M14 8L21 11.5V17.5L14 21L7 17.5V11.5L14 8Z" fill="#C9933A"/><path d="M14 11L18 13V17L14 19L10 17V13L14 11Z" fill="#0B1929"/></svg></div>
+    <span class="bname">AusBank</span>
+    <div class="seg">
+      <button class="sbb on" id="vs-digital" onclick="switchView('digital',this)">🎧 Digital Access <span class="seg-chip live">LIVE</span></button>
+      <button class="sbb" id="vs-payment" onclick="switchView('payment',this)">💳 Payments <span class="seg-chip warn" id="pmChip">4 ALERTS</span></button>
+    </div>
+    <div class="ctx" id="callCtx">
+      <div class="ctx-dot"></div>
+      <span class="ctx-name">Marcus Henley</span>
+      <span class="ctx-sep">·</span>
+      <span class="ctx-timer" id="ctimer">00:03:24</span>
+      <span class="ctx-sep">·</span>
+      <span class="ctx-id">CIF 00429 · Premier</span>
+    </div>
+    <div class="bright">
+      <span class="bq" onclick="showT('⏳','b','Queue','12 waiting · avg 4m 32s')">⏳ 12 in queue</span>
+      <div class="bibtn" onclick="showT('🔔','amber','Alerts','3 escalation alerts from Fraud team')">🔔</div>
+      <span class="bclk" id="bclk">09:41:22</span>
+      <div class="bagent" onclick="openLogout()"><div class="odot"></div><div class="bav">SL</div><span class="ban">Sarah Liu</span></div>
+    </div>
+  </div>
+
+  <!-- DIGITAL -->
+  <div class="view on" id="view-digital">
+    <div class="ws">
+      <div class="lp">
+        <div class="lph"><span class="lpht">Customer</span><span style="font-size:9px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:3px;font-weight:700;">✓ Verified</span></div>
+        <div class="lpb">
+          <div class="cident">
+            <div class="cav">MH</div>
+            <div><div class="cname">Marcus Henley</div><div class="csub">CIF: 00429-AUS-17643</div></div>
+            <div class="rchip">HIGH RISK</div>
+          </div>
+          <div class="rrisk">
+            <span class="rlbl">Fraud Risk</span>
+            <div class="rtrack"><div class="rfill" id="rfill" style="width:74%"></div></div>
+            <span class="rnum" id="rnum">74</span>
+          </div>
+          <div class="si3">
+            <div class="si3c d"><div class="si3n" id="fcnt">7</div><div class="si3l">Failures</div></div>
+            <div class="si3c w"><div class="si3n">3</div><div class="si3l">Devices</div></div>
+            <div class="si3c i"><div class="si3n">2</div><div class="si3l">OTP</div></div>
+          </div>
+          <div class="slbl">Account</div>
+          <div class="kvl" style="margin-bottom:14px;">
+            <div class="kv"><span class="kk">Product</span><span class="kvv">Everyday · ****4821</span></div>
+            <div class="kv"><span class="kk">Segment</span><span class="kvv">Premier</span></div>
+            <div class="kv"><span class="kk">Mobile</span><span class="kvv">+61 4XX XXX 812</span></div>
+            <div class="kv"><span class="kk">Balance</span><span class="kvv">$12,841.50</span></div>
+            <div class="kv"><span class="kk">NPS</span><span class="kvv w">42 / 100</span></div>
+          </div>
+          <div class="slbl">Digital Timeline</div>
+          <div class="tl" id="tlMain">
+            <div class="tli"><div class="tlid i">↗</div><div><div class="tlit">App launched</div><div class="tlim">09:41:02 · iPhone 14 Pro · 5G</div></div></div>
+            <div class="tli"><div class="tlid f">✕</div><div><div class="tlit">Login failed × 2</div><div class="tlim">09:41:18–45 · Sydney CBD</div></div></div>
+            <div class="tli"><div class="tlid w">!</div><div><div class="tlit">OTP requested · expired</div><div class="tlim">09:42:10 · Optus · 2-min TTL</div></div></div>
+            <div class="tli"><div class="tlid f">✕</div><div><div class="tlit">Soft lock applied</div><div class="tlim">09:44:28 · Attempt 3/5</div></div></div>
+            <div class="tli"><div class="tlid w">⚠</div><div><div class="tlit">New device detected</div><div class="tlim">09:46:01 · Samsung S24 · Parramatta</div><span class="tlip nd">NEW DEVICE</span></div></div>
+            <div class="tli"><div class="tlid f">🔒</div><div><div class="tlit">Biometric failed · Account locked</div><div class="tlim">09:46:22–47:05 · All channels</div><span class="tlip live">LIVE</span></div></div>
+          </div>
+          <div id="etl"></div>
+          <div class="slbl" style="margin-top:13px;">History</div>
+          <div style="font-size:10px;color:var(--t2);line-height:1.75;">
+            <div style="padding:3px 0;border-bottom:1px solid var(--ln)"><span style="color:var(--t3);font-family:var(--mono)">02 Apr</span> &nbsp;Password reset · resolved</div>
+            <div style="padding:3px 0;border-bottom:1px solid var(--ln)"><span style="color:var(--t3);font-family:var(--mono)">18 Mar</span> &nbsp;Disputed txn $249 · escalated</div>
+            <div style="padding:3px 0"><span style="color:var(--t3);font-family:var(--mono)">05 Jan</span> &nbsp;Card replacement · resolved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp">
+        <div class="astrip">
+          <div class="asdot"></div>
+          <div class="astxt"><strong>Account locked</strong> — Marcus Henley · All digital channels · 09:47:05 AEST · Verify identity before unlocking.</div>
+        </div>
+        <div class="tabs">
+          <div class="tab on" onclick="swCtab('events',this)">Events</div>
+          <div class="tab" onclick="swCtab('devices',this)">Devices</div>
+          <div class="tab" onclick="swCtab('history',this)">Call History</div>
+          <div class="tab" onclick="swCtab('fraud',this)">Fraud</div>
+        </div>
+        <div class="tpane on" id="ctab-events">
+          <div id="nec"></div>
+          <div class="ev crit" onclick="this.classList.toggle('expanded')"><div class="evdot crit"></div><div class="evm"><div class="evh"><div class="evn">AUTH_ACCOUNT_LOCKED</div><div class="evt">09:47:05</div></div><div class="evd">Locked after max failed attempts — all channels suspended, agent unlock required.</div><div class="evdata">event_id: <span>EVT-9842</span> · channel: <span>mobile_app</span> · lock_scope: <span>ALL_CHANNELS</span></div></div></div>
+          <div class="ev crit" onclick="this.classList.toggle('expanded')"><div class="evdot crit"></div><div class="evm"><div class="evh"><div class="evn">AUTH_BIOMETRIC_FAIL</div><div class="evt">09:46:22</div></div><div class="evd">Fingerprint failed on Samsung S24 — not enrolled, match score 0.12 vs 0.85 threshold.</div><div class="evdata">device_id: <span>AND-S24-9924</span> · match_score: <span>0.12</span> · threshold: <span>0.85</span></div></div></div>
+          <div class="ev warn" onclick="this.classList.toggle('expanded')"><div class="evdot warn"></div><div class="evm"><div class="evh"><div class="evn">DEVICE_NEW_UNRECOGNISED</div><div class="evt">09:46:01</div></div><div class="evd">Login from unregistered Android in Parramatta — 23km from primary Sydney CBD device.</div><div class="evdata">device: <span>Samsung Galaxy S24</span> · os: <span>Android 14</span> · geo: <span>Parramatta NSW 2150</span></div></div></div>
+          <div class="ev crit" onclick="this.classList.toggle('expanded')"><div class="evdot crit"></div><div class="evm"><div class="evh"><div class="evn">AUTH_SOFT_LOCK</div><div class="evt">09:44:28</div></div><div class="evd">Soft lock after 3rd failure. 30-min cooldown — agent unlock available.</div><div class="evdata">attempts_used: <span>3</span> · limit: <span>5</span> · cooldown_mins: <span>30</span></div></div></div>
+          <div class="ev warn" onclick="this.classList.toggle('expanded')"><div class="evdot warn"></div><div class="evm"><div class="evh"><div class="evn">OTP_EXPIRED</div><div class="evt">09:44:10</div></div><div class="evd">OTP sent 09:42:10 expired unused — 2-minute TTL elapsed.</div><div class="evdata">otp_ref: <span>OTP-72841</span> · ttl: <span>120s</span> · status: <span>EXPIRED_UNUSED</span></div></div></div>
+          <div class="ev inf" onclick="this.classList.toggle('expanded')"><div class="evdot inf"></div><div class="evm"><div class="evh"><div class="evn">OTP_REQUESTED</div><div class="evt">09:42:10</div></div><div class="evd">SMS OTP delivered to +61 4XX XXX 812 via Optus in 1.2s.</div><div class="evdata">carrier: <span>Optus</span> · latency_ms: <span>1200</span> · status: <span>DELIVERED</span></div></div></div>
+          <div class="ev crit" onclick="this.classList.toggle('expanded')"><div class="evdot crit"></div><div class="evm"><div class="evh"><div class="evn">AUTH_PASSWORD_FAIL × 2</div><div class="evt">09:41:18</div></div><div class="evd">Two wrong passwords on iPhone 14 Pro (Sydney CBD), 27 seconds apart.</div><div class="evdata">device_id: <span>IOS-14P-3381</span> · interval_secs: <span>27</span></div></div></div>
+          <div class="ev inf" onclick="this.classList.toggle('expanded')"><div class="evdot inf"></div><div class="evm"><div class="evh"><div class="evn">APP_SESSION_STARTED</div><div class="evt">09:41:02</div></div><div class="evd">App v4.8.2 launched · iPhone 14 Pro · session SES-29104.</div><div class="evdata">app_version: <span>4.8.2</span> · session_id: <span>SES-29104</span> · network: <span>5G</span></div></div></div>
+          <div style="font-size:10px;color:var(--t3);text-align:center;padding:8px 0;">Tap any event to expand payload</div>
+        </div>
+        <div class="tpane" id="ctab-devices">
+          <div class="dcard"><div class="dch"><div class="dico" style="background:var(--blue-bg)">📱</div><div><div class="dnam">iPhone 14 Pro</div><div class="dsub">iOS 17.4 · App 4.8.2 · Primary</div></div><div class="dbadge trusted">TRUSTED</div></div><div class="dgrid"><div class="dfl"><label>Device ID</label><span>IOS-14P-3381</span></div><div class="dfl"><label>Last login</label><span>Today 09:41</span></div><div class="dfl"><label>Location</label><span>Sydney CBD</span></div><div class="dfl"><label>Biometrics</label><span>Face ID ✓</span></div></div></div>
+          <div class="dcard" style="border-color:var(--amber-bdr)"><div class="dch"><div class="dico" style="background:var(--amber-bg)">📲</div><div><div class="dnam">Samsung Galaxy S24</div><div class="dsub">Android 14 · Never registered</div></div><div class="dbadge unknown">UNKNOWN</div></div><div class="dgrid"><div class="dfl"><label>Device ID</label><span>AND-S24-9924</span></div><div class="dfl"><label>First seen</label><span>Today 09:46</span></div><div class="dfl"><label>Location</label><span>Parramatta 2150</span></div><div class="dfl"><label>Distance</label><span>~23 km away</span></div></div><div style="margin-top:8px;display:flex;gap:5px;"><button class="pb pbg" style="font-size:11px;padding:4px 10px;" onclick="showT('🚩','amber','Flagged','AND-S24-9924 flagged for review')">🚩 Flag</button><button class="pb pbg" style="font-size:11px;padding:4px 10px;" onclick="showT('🚫','b','Blocked','Device registration blocked')">🚫 Block</button></div></div>
+        </div>
+        <div class="tpane" id="ctab-history">
+          <div class="chr"><div class="chrm"><span class="chrd">02 Apr 2025 · 14:22</span><span class="chro res">RESOLVED</span><span style="font-size:10px;color:var(--t3)">Priya Singh</span><span class="chrdur">6m 42s</span></div><div class="chrr">Password Reset</div><div class="chrn">Forgot password after device upgrade. KYC verified, temp password issued.</div></div>
+          <div class="chr"><div class="chrm"><span class="chrd">18 Mar 2025 · 10:05</span><span class="chro esc">ESCALATED</span><span style="font-size:10px;color:var(--t3)">Tom Crawford</span><span class="chrdur">11m 18s</span></div><div class="chrr">Disputed Transaction $249</div><div class="chrn">Unrecognised debit denied — escalated to Fraud, Case #FRD-8841.</div></div>
+          <div class="chr"><div class="chrm"><span class="chrd">05 Jan 2025 · 09:44</span><span class="chro res">RESOLVED</span><span style="font-size:10px;color:var(--t3)">Sarah Liu</span><span class="chrdur">4m 55s</span></div><div class="chrr">Card Replacement</div><div class="chrn">Lost card cancelled, replacement dispatched.</div></div>
+        </div>
+        <div class="tpane" id="ctab-fraud">
+          <div class="ev warn" onclick="this.classList.toggle('expanded')"><div class="evdot warn"></div><div class="evm"><div class="evh"><div class="evn">GEO_ANOMALY_DETECTED</div><div class="evt">09:46:01</div></div><div class="evd">Sydney CBD + Parramatta within 5 min — 23km apart, two simultaneous devices.</div><div class="evdata">distance_km: <span>23</span> · time_diff_mins: <span>5</span> · risk_delta: <span>+18pts</span></div></div></div>
+          <div class="ev warn" onclick="this.classList.toggle('expanded')"><div class="evdot warn"></div><div class="evm"><div class="evh"><div class="evn">VELOCITY_ANOMALY</div><div class="evt">09:41:18</div></div><div class="evd">7 attempts in 6 min vs baseline 1–2 per session (+483% deviation).</div><div class="evdata">attempts: <span>7</span> · baseline: <span>1.2/session</span> · risk_delta: <span>+24pts</span></div></div></div>
+          <div style="padding:9px 11px;background:var(--amber-bg);border:1px solid var(--amber-bdr);border-radius:var(--r);margin-top:2px;"><div style="font-size:10px;font-weight:700;color:var(--amber);margin-bottom:5px;">⚠ Escalation threshold reached</div><div style="font-size:11px;color:var(--t2);margin-bottom:7px;line-height:1.5;">Risk 74 + geo-anomaly + unknown device meets fraud escalation criteria.</div><button class="pb pbg" style="font-size:11px;padding:4px 11px;" onclick="showT('⬆','b','Escalated','Case sent to Fraud Operations')">Escalate →</button></div>
+        </div>
+        <div class="nb">
+          <div class="nbr"><input class="ninput" id="anote" placeholder="Log outcome, actions taken, resolution…" maxlength="500"/><button class="nsend" onclick="addNote()">Log</button></div>
+          <div class="chips">
+            <div class="chip" onclick="fn('Identity verified via KYC — DOB, address and last transaction confirmed.')">✓ Identity verified</div>
+            <div class="chip" onclick="fn('Account unlocked across all digital channels via Agent Portal.')">🔓 Unlocked</div>
+            <div class="chip" onclick="fn('Temp password issued via SMS. 4-hour expiry.')">🔑 Temp password</div>
+            <div class="chip" onclick="fn('Samsung S24 — customer confirmed NOT their device. Blocked, flagged for fraud.')">🚩 Device flagged</div>
+            <div class="chip" onclick="fn('Escalated to Fraud Team — case FRD-8841 referenced.')">⬆ Escalated</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp" style="grid-template-rows:auto auto 1fr;display:flex;flex-direction:column;">
+        <div class="rph"><span class="lpht">AI Assist</span><span style="font-size:9px;color:var(--gold);font-weight:600;">AUTO-SURFACED</span></div>
+        <div class="rp-tabs">
+          <div class="rp-tab on" onclick="swRpTab('assist',this)">Actions</div>
+          <div class="rp-tab" onclick="swRpTab('sentiment',this)">Sentiment</div>
+          <div class="rp-tab" onclick="swRpTab('summary',this)">Call Summary</div>
+        </div>
+
+        <!-- ASSIST PANE -->
+        <div class="rp-pane on" id="rp-assist">
+          <div class="slbl">Actions</div>
+          <div class="acl">
+            <div class="aci" id="ac1" onclick="doAct(this)"><div class="ack h">!</div><div><div class="act">Verify identity &amp; unlock account</div><div class="acd">100-pt KYC → Agent Portal → Security → Digital Unlock</div></div></div>
+            <div class="aci" id="ac2" onclick="doAct(this)"><div class="ack h">!</div><div><div class="act">Confirm Samsung S24 ownership</div><div class="acd">Unrecognised in Parramatta — confirm or block</div></div></div>
+            <div class="aci" id="ac3" onclick="doAct(this)"><div class="ack m">·</div><div><div class="act">Issue temporary password</div><div class="acd">Via SMS · 4-hour expiry</div></div></div>
+            <div class="aci" id="ac4" onclick="doAct(this)"><div class="ack l">·</div><div><div class="act">Guide biometric re-enrolment</div><div class="acd">Settings → Security → Fingerprint on S24</div></div></div>
+          </div>
+          <div class="slbl">Channels</div>
+          <div class="csr" style="margin-bottom:14px;">
+            <div class="csc lk"><div class="cscd"></div>Mobile</div>
+            <div class="csc lk"><div class="cscd"></div>Internet Banking</div>
+            <div class="csc ac"><div class="cscd"></div>Voice</div>
+            <div class="csc op"><div class="cscd"></div>Branch / ATM</div>
+          </div>
+          <div class="slbl">Knowledge Base</div>
+          <button class="kbb" onclick="toggleKB('kb1',this)">Account Unlock <span>›</span></button>
+          <div class="kbc" id="kb1"><ol><li>100-pt ID: DOB, home address, last transaction</li><li>Agent Portal → Customer → Security → Digital Unlock</li><li>Select scope: Mobile / Web / All Channels</li><li>Issue temp password — 4-hour SMS expiry</li><li>Log reason code: AUTH-UNLOCK-AGENT</li></ol></div>
+          <button class="kbb" onclick="toggleKB('kb2',this)">Fraud Escalation <span>›</span></button>
+          <div class="kbc fraud" id="kb2"><ol><li>Customer denies device → escalate immediately</li><li>Risk score > 80 → mandatory fraud referral</li><li>Geo-anomaly + velocity → flag and escalate</li><li>Fraud Ops: ext. 7700 or JIRA Fraud Portal</li></ol></div>
+        </div>
+
+        <!-- SENTIMENT PANE -->
+        <div class="rp-pane" id="rp-sentiment">
+          <div class="slbl">Emotional Journey</div>
+          <div class="sj-wrap">
+            <div class="sj-track">
+              <div class="sj-line"></div>
+              <div class="sj-fill" id="sjFill" style="width:0%"></div>
+              <div class="sj-nodes">
+                <div class="sj-node">
+                  <div class="sj-dot distressed" id="sn0">😤</div>
+                  <div class="sj-lbl" id="sl0">Distressed</div>
+                  <div class="sj-time" id="st0"></div>
+                </div>
+                <div class="sj-node">
+                  <div class="sj-dot frustrated" id="sn1">😟</div>
+                  <div class="sj-lbl" id="sl1">Frustrated</div>
+                  <div class="sj-time" id="st1"></div>
+                </div>
+                <div class="sj-node">
+                  <div class="sj-dot cautious" id="sn2">😐</div>
+                  <div class="sj-lbl" id="sl2">Cautious</div>
+                  <div class="sj-time" id="st2"></div>
+                </div>
+                <div class="sj-node">
+                  <div class="sj-dot relieved" id="sn3">😌</div>
+                  <div class="sj-lbl" id="sl3">Relieved</div>
+                  <div class="sj-time" id="st3"></div>
+                </div>
+                <div class="sj-node">
+                  <div class="sj-dot satisfied" id="sn4">😊</div>
+                  <div class="sj-lbl" id="sl4">Satisfied</div>
+                  <div class="sj-time" id="st4"></div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--t3);text-align:center;margin-top:2px;" id="sjStatus">Tracking in progress…</div>
+          </div>
+
+          <div class="slbl">Live Tone Analysis</div>
+          <div class="tone-grid">
+            <div class="tone-row"><span class="tone-lbl">Frustration</span><div class="tone-track"><div class="tone-fill" id="tf0" style="width:82%;background:var(--red)"></div></div><span class="tone-val" id="tv0" style="color:var(--red)">82%</span></div>
+            <div class="tone-row"><span class="tone-lbl">Anxiety</span><div class="tone-track"><div class="tone-fill" id="tf1" style="width:68%;background:#C47A9B"></div></div><span class="tone-val" id="tv1" style="color:#C47A9B">68%</span></div>
+            <div class="tone-row"><span class="tone-lbl">Cooperation</span><div class="tone-track"><div class="tone-fill" id="tf2" style="width:55%;background:var(--blue)"></div></div><span class="tone-val" id="tv2" style="color:var(--blue)">55%</span></div>
+            <div class="tone-row"><span class="tone-lbl">Confidence</span><div class="tone-track"><div class="tone-fill" id="tf3" style="width:28%;background:var(--amber)"></div></div><span class="tone-val" id="tv3" style="color:var(--amber)">28%</span></div>
+            <div class="tone-row"><span class="tone-lbl">Satisfaction</span><div class="tone-track"><div class="tone-fill" id="tf4" style="width:12%;background:var(--green)"></div></div><span class="tone-val" id="tv4" style="color:var(--green)">12%</span></div>
+          </div>
+          <div class="tone-tip" id="toneTip">Customer shows high frustration. Acknowledge the inconvenience before diving into technical resolution steps.</div>
+
+          <div class="slbl" style="margin-top:14px;">Conversation Log</div>
+          <div class="tx-area">
+            <div class="tx-msgs" id="txMsgs">
+              <div class="tx-msg customer">"I've been locked out for 20 minutes and I have bills to pay right now — this is completely unacceptable."</div>
+              <div class="tx-msg agent">"I completely understand how frustrating that must be, Marcus. I can see exactly what happened and I'm going to fix this for you right now."</div>
+              <div class="tx-msg customer">"There was also some weird phone I didn't recognise — is someone trying to get into my account?"</div>
+            </div>
+            <div class="tx-input-row">
+              <select class="tx-who" id="txWho">
+                <option value="agent">🎧 Agent</option>
+                <option value="customer">👤 Customer</option>
+              </select>
+              <input class="tx-inp" id="txInp" placeholder="Log what was said…" maxlength="200"/>
+              <button class="tx-add" onclick="addTxLine()">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUMMARY PANE -->
+        <div class="rp-pane" id="rp-summary">
+          <div class="slbl">AI Call Summary</div>
+          <button class="sum-gen-btn" id="genBtn" onclick="generateSummary()">
+            <span id="genIcon">✦</span> Generate AI Summary
+          </button>
+          <div id="sumOut">
+            <div class="sum-empty">
+              <div class="sum-empty-icon">📋</div>
+              <div class="sum-empty-text">Click Generate to analyse the call context, digital events, and conversation log and produce a structured sentiment summary.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="view" id="view-payment">
+    <div class="pv">
+      <div class="pvalert" id="pvAlert">
+        <div class="pval"><div class="pvai">⚠</div><div><div class="pvat">Critical — Repeated Payment Failures</div><div class="pvas">James O'Brien · 4 failed card transactions in 8 minutes</div></div></div>
+        <button class="pvcon" onclick="pvConnectNow()">Connect now →</button>
+      </div>
+      <div class="pvlay">
+        <div class="pvlist">
+          <div class="pvlh"><span class="pvlt">Monitoring</span><span class="pvlb" id="pvBadge">4 Alerts</span></div>
+          <div class="pvcards" id="pvList"></div>
+        </div>
+        <div class="pvd" id="pvDetail"></div>
+      </div>
+      <div class="pvstb">
+        <div class="pvsitm"><span><span class="sdot g"></span>Core Banking</span><span><span class="sdot g"></span>CRM</span><span><span class="sdot r"></span>Payment Gateway: Degraded</span><span><span class="sdot g"></span>CTI</span></div>
+        <span style="font-family:var(--mono);font-size:10px;">AUS-SYD-01 · <span id="pvST">00:00:00</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mov" id="mOv"><div class="mbox"><div class="mic g" id="mIc">📞</div><div class="mt" id="mTit">Confirm</div><div class="mb" id="mBod">Sure?</div><div class="mac"><button class="mcan" onclick="closeModal()">Cancel</button><button class="mcon g" id="mCon" onclick="closeModal()">Confirm</button></div></div></div>
+<div class="toast" id="toast"><span class="tico" id="tico">✓</span><div class="tit" id="tit">Done</div><div class="tib" id="tib"></div></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+
+/* ============================================================
+   AusBank Contact Centre — Unified JS (clean rewrite)
+   ============================================================ */
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showT(ico,cls,title,body){
+  var t=document.getElementById('toast');
+  document.getElementById('tico').textContent=ico;
+  document.getElementById('tit').textContent=title;
+  document.getElementById('tib').textContent=body||'';
+  t.className='toast on '+cls;
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){t.classList.remove('on');},3400);
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+function showModal(ico,cls,title,body,lbl,ok){
+  document.getElementById('mIc').textContent=ico;
+  document.getElementById('mIc').className='mic '+cls;
+  document.getElementById('mTit').textContent=title;
+  document.getElementById('mBod').innerHTML=body;
+  var b=document.getElementById('mCon');
+  b.textContent=lbl;
+  b.className='mcon '+cls;
+  b.onclick=function(){closeModal();if(ok)ok();};
+  document.getElementById('mOv').classList.add('on');
+}
+function closeModal(){document.getElementById('mOv').classList.remove('on');}
+window.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('mOv').addEventListener('click',function(e){if(e.target.id==='mOv')closeModal();});
+});
+function openLogout(){showModal('&#128100;','b','Sign out','Your call notes will be saved automatically.','Sign out',doLogout);}
+
+// ── LOGIN ────────────────────────────────────────────────────────────────────
+function doLogin(){
+  var e=document.getElementById('lEmail').value.trim();
+  var p=document.getElementById('lPass').value.trim();
+  var err=document.getElementById('lErr');
+  if(e==='agent@ausbank.com.au' && p==='agent123'){
+    err.style.display='none';
+    var ls=document.getElementById('loginScreen');
+    ls.style.opacity='0'; ls.style.transition='opacity .35s';
+    setTimeout(function(){
+      ls.style.display='none';
+      document.getElementById('app').classList.add('on');
+      startTimer(); startClock(); pvInit(); startLive();
+    },360);
+  } else {
+    err.style.display='block';
+  }
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+function doLogout(){
+  document.getElementById('app').classList.remove('on');
+  var ls=document.getElementById('loginScreen');
+  ls.style.display='flex'; ls.style.opacity='1';
+  secs=204;
+}
+
+// ── VIEW SWITCH ──────────────────────────────────────────────────────────────
+function switchView(id,btn){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+  document.querySelectorAll('.sbb').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('view-'+id).classList.add('on');
+  btn.classList.add('on');
+  document.getElementById('callCtx').style.display=(id==='digital')?'':'none';
+}
+
+// ── CENTRE TABS ──────────────────────────────────────────────────────────────
+function swCtab(id,el){
+  document.querySelectorAll('#view-digital .tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.tpane').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('ctab-'+id).classList.add('on');
+}
+
+// ── RIGHT PANEL TABS ─────────────────────────────────────────────────────────
+function swRpTab(id,el){
+  document.querySelectorAll('.rp-tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.rp-pane').forEach(function(p){p.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('rp-'+id).classList.add('on');
+}
+
+// ── KB TOGGLE ────────────────────────────────────────────────────────────────
+function toggleKB(id,btn){
+  var c=document.getElementById(id);
+  var o=c.classList.toggle('on');
+  btn.querySelector('span').textContent=o?'&#8744;':'&#8250;';
+}
+
+// ── CALL TIMER ───────────────────────────────────────────────────────────────
+var secs=204;
+function startTimer(){
+  setInterval(function(){
+    secs++;
+    var m=String(Math.floor(secs/60)).padStart(2,'0');
+    var s=String(secs%60).padStart(2,'0');
+    document.getElementById('ctimer').textContent='00:'+m+':'+s;
+  },1000);
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+var pvS=0;
+function startClock(){
+  function tick(){
+    var n=new Date();
+    var t=[n.getHours(),n.getMinutes(),n.getSeconds()].map(function(x){return String(x).padStart(2,'0');}).join(':');
+    document.getElementById('bclk').textContent=t;
+    pvS++;
+    var h=String(Math.floor(pvS/3600)).padStart(2,'0');
+    var m=String(Math.floor((pvS%3600)/60)).padStart(2,'0');
+    var s=String(pvS%60).padStart(2,'0');
+    var st=document.getElementById('pvST');
+    if(st)st.textContent=h+':'+m+':'+s;
+  }
+  setInterval(tick,1000); tick();
+}
+
+// ── AGENT NOTES ──────────────────────────────────────────────────────────────
+var nn=0;
+function fn(t){document.getElementById('anote').value=t;}
+function addNote(){
+  var inp=document.getElementById('anote');
+  var val=inp.value.trim(); if(!val)return;
+  nn++;
+  var c=document.getElementById('nec');
+  var t=new Date().toTimeString().slice(0,8);
+  var el=document.createElement('div');
+  el.className='ev suc new';
+  el.innerHTML='<div class="evdot ag"></div><div class="evm">'
+    +'<div class="evh"><div class="evn" style="color:var(--purple)">AGENT_NOTE_'+String(nn).padStart(3,'0')+'</div><div class="evt">'+t+'</div></div>'
+    +'<div class="evd">'+val+'</div></div>';
+  c.insertBefore(el,c.firstChild);
+  document.querySelectorAll('#view-digital .tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.tpane').forEach(function(p){p.classList.remove('on');});
+  document.querySelector('#view-digital .tab').classList.add('on');
+  document.getElementById('ctab-events').classList.add('on');
+  inp.value='';
+  showT('&#10003;','g','Logged','Note saved to call record');
+  analyseConversationSentiment();
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────────────────
+function doAct(item){
+  if(item.classList.contains('done'))return;
+  item.classList.add('done');
+  var k=item.querySelector('.ack');
+  k.className='ack x'; k.textContent='&#10003;';
+  showT('&#10003;','g','Done','Action marked complete');
+  analyseConversationSentiment();
+}
+
+// ── LIVE EVENTS ──────────────────────────────────────────────────────────────
+var liveQ=[
+  {d:7000,cls:'warn',dot:'warn',n:'AUTH_SELF_SERVICE_ATTEMPT',
+   desc:'Self-service reset attempted while on hold — blocked, account in full lock state.',
+   data:'channel: <span>mobile_app</span> · blocked_reason: <span>account_locked</span>'},
+  {d:18000,cls:'inf',dot:'inf',n:'IVR_NAVIGATION_EVENT',
+   desc:'IVR: Main to Digital Banking to Login Issues — transferred. Duration: 62s.',
+   data:'ivr_path: <span>Main &rarr; Digital &rarr; Login Issues</span> · duration_secs: <span>62</span>'},
+  {d:32000,cls:'suc',dot:'suc',n:'IDENTITY_VERIFICATION_PASSED',
+   desc:'100-pt KYC passed — DOB, address and last transaction verified. Cleared for unlock.',
+   data:'score: <span>100pts</span> · verified_by: <span>AGB-2241</span>'},
+];
+
+function startLive(){
+  initSentimentJourney();
+  liveQ.forEach(function(ev){
+    setTimeout(function(){
+      var c=document.getElementById('nec');
+      var t=new Date().toTimeString().slice(0,8);
+      var el=document.createElement('div');
+      el.className='ev '+ev.cls+' new';
+      el.setAttribute('onclick','this.classList.toggle("expanded")');
+      el.innerHTML='<div class="evdot '+ev.dot+'"></div><div class="evm">'
+        +'<div class="evh"><div class="evn">'+ev.n+'</div><div class="evt">'+t+'</div></div>'
+        +'<div class="evd">'+ev.desc+'</div><div class="evdata">'+ev.data+'</div></div>';
+      c.insertBefore(el,c.firstChild);
+      if(ev.cls==='suc'){
+        var et=document.getElementById('etl');
+        var item=document.createElement('div');
+        item.className='tli';
+        item.innerHTML='<div class="tlid ok">&#10003;</div><div>'
+          +'<div class="tlit">Identity verified by agent</div>'
+          +'<div class="tlim">'+t+' &middot; KYC 100pts</div>'
+          +'<span class="tlip ok">VERIFIED</span></div>';
+        et.appendChild(item);
+      }
+    },ev.d);
+  });
+  setTimeout(function(){
+    document.getElementById('rnum').textContent='82';
+    document.getElementById('rfill').style.width='82%';
+    document.getElementById('fcnt').textContent='8';
+  },8000);
+}
+
+// ── SENTIMENT JOURNEY ────────────────────────────────────────────────────────
+var SJ_PHASES=[
+  {id:0,fillPct:0,  delay:100},
+  {id:1,fillPct:25, delay:8000},
+  {id:2,fillPct:50, delay:20000},
+  {id:3,fillPct:75, delay:35000},
+  {id:4,fillPct:100,delay:50000},
+];
+var SJ_TONES=[
+  {f:[82,68,55,28,12],tip:'High frustration detected. Acknowledge the inconvenience before technical steps.'},
+  {f:[72,60,62,35,18],tip:'Frustration easing. Customer is engaging — keep the conversation moving.'},
+  {f:[50,42,74,52,30],tip:'Tone shifting to cautious cooperation. Stay clear and direct.'},
+  {f:[28,22,85,72,55],tip:'Customer relieved. Confirm every action taken and set clear expectations.'},
+  {f:[12,10,90,88,82],tip:'Satisfaction is high. A warm close will leave a strong impression.'},
+];
+var currentPhase=0;
+
+function initSentimentJourney(){
+  reachPhase(0);
+  SJ_PHASES.slice(1).forEach(function(p){
+    setTimeout(function(){reachPhase(p.id);},p.delay);
+  });
+}
+
+function reachPhase(phaseIdx){
+  currentPhase=phaseIdx;
+  for(var i=0;i<=phaseIdx;i++){
+    var dot=document.getElementById('sn'+i);
+    var lbl=document.getElementById('sl'+i);
+    var tim=document.getElementById('st'+i);
+    if(!dot)continue;
+    dot.classList.add('reached');
+    if(i<phaseIdx)dot.classList.remove('current');
+    if(i===phaseIdx)dot.classList.add('current');
+    lbl.classList.add('reached');
+    if(!tim.textContent){
+      var now=new Date();
+      tim.textContent=now.toTimeString().slice(0,5);
+    }
+  }
+  if(phaseIdx>0){
+    var prev=document.getElementById('sn'+(phaseIdx-1));
+    if(prev)prev.classList.remove('current');
+  }
+  var fill=document.getElementById('sjFill');
+  if(fill)fill.style.width=SJ_PHASES[phaseIdx].fillPct+'%';
+  var statuses=['Pre-call distress detected from digital events','Customer frustrated on opening',
+    'Customer cautious — cooperating','Resolution achieved — customer relieved','Customer satisfied — closing'];
+  var stEl=document.getElementById('sjStatus');
+  if(stEl)stEl.textContent=statuses[phaseIdx];
+  updateToneBars(phaseIdx);
+}
+
+function updateToneBars(phaseIdx){
+  var t=SJ_TONES[phaseIdx];
+  t.f.forEach(function(v,i){
+    var fill=document.getElementById('tf'+i);
+    var val=document.getElementById('tv'+i);
+    if(fill)fill.style.width=v+'%';
+    if(val)val.textContent=v+'%';
+  });
+  var tipEl=document.getElementById('toneTip');
+  if(tipEl)tipEl.textContent=t.tip;
+}
+
+// ── CONVERSATION LOG ─────────────────────────────────────────────────────────
+function addTxLine(){
+  var inp=document.getElementById('txInp');
+  var who=document.getElementById('txWho');
+  var txt=inp.value.trim(); if(!txt)return;
+  var msgs=document.getElementById('txMsgs');
+  var el=document.createElement('div');
+  el.className='tx-msg '+who.value;
+  el.textContent='"'+txt+'"';
+  msgs.appendChild(el);
+  msgs.scrollTop=msgs.scrollHeight;
+  inp.value='';
+  analyseConversationSentiment();
+}
+
+function analyseConversationSentiment(){
+  var doneCt=document.querySelectorAll('.aci.done').length;
+  if(doneCt>=3 && currentPhase<3)reachPhase(3);
+  else if(doneCt>=1 && currentPhase<2)reachPhase(2);
+}
+
+// ── AI SUMMARY ───────────────────────────────────────────────────────────────
+var summaryGenerated=false;
+
+function buildCallContext(){
+  var notes=[];
+  document.querySelectorAll('#nec .ev').forEach(function(ev){
+    var name=ev.querySelector('.evn');
+    var desc=ev.querySelector('.evd');
+    if(name&&desc)notes.push(name.textContent+': '+desc.textContent);
+  });
+  var txLines=[];
+  document.querySelectorAll('#txMsgs .tx-msg').forEach(function(m){
+    var who=m.classList.contains('agent')?'Agent':'Customer';
+    txLines.push(who+': '+m.textContent);
+  });
+  var actions=[];
+  document.querySelectorAll('.aci').forEach(function(a){
+    var title=a.querySelector('.act');
+    if(title)actions.push({done:a.classList.contains('done'),text:title.textContent});
+  });
+  var timerEl=document.getElementById('ctimer');
+  return {
+    callDuration:timerEl?timerEl.textContent:'00:07:xx',
+    conversation:txLines,
+    agentNotes:notes,
+    actionsCompleted:actions.filter(function(a){return a.done;}).map(function(a){return a.text;}),
+    actionsPending:actions.filter(function(a){return !a.done;}).map(function(a){return a.text;}),
+    currentSentimentPhase:['Distressed','Frustrated','Cautious','Relieved','Satisfied'][currentPhase],
+    fraudRisk:document.getElementById('rnum')?document.getElementById('rnum').textContent:'74'
+  };
+}
+
+async function generateSummary(){
+  if(summaryGenerated)return;
+  var btn=document.getElementById('genBtn');
+  var icon=document.getElementById('genIcon');
+  btn.disabled=true;
+  icon.className='spin'; icon.textContent='&#9675;';
+  btn.childNodes[2].textContent=' Analysing call...';
+  var ctx=buildCallContext();
+  var convText=ctx.conversation.length>0?ctx.conversation.join('\n')
+    :'Agent acknowledged account lockout and guided customer through KYC verification. '
+    +'Customer was distressed about being locked out and concerned about the unrecognised device. '
+    +'Agent confirmed identity, unlocked account, and explained the device security steps.';
+  var prompt='You are an expert banking contact centre analyst. Analyse this call context and produce a structured sentiment summary as a JSON object.\n\n'
+    +'CUSTOMER: Marcus Henley | Segment: Premier | Member since: 2018 | Fraud Risk: '+ctx.fraudRisk+'/100\n'
+    +'CALL DURATION: '+ctx.callDuration+' | AGENT: Sarah Liu (AGB-2241)\n\n'
+    +'DIGITAL EVENTS: Account locked after 7 failed login attempts across 2 devices. Unrecognised Samsung S24 in Parramatta (23km from primary). Geo-anomaly and velocity anomaly detected. All digital channels locked.\n\n'
+    +'CONVERSATION:\n'+convText+'\n\n'
+    +'ACTIONS COMPLETED: '+( ctx.actionsCompleted.join(', ')||'Identity verification, account unlock')+'\n'
+    +'ACTIONS PENDING: '+(ctx.actionsPending.join(', ')||'None')+'\n'
+    +'CURRENT SENTIMENT: '+ctx.currentSentimentPhase+'\n\n'
+    +'Respond ONLY with a valid JSON object (no markdown, no backticks) with this structure:\n'
+    +'{"overall_sentiment_journey":"e.g. Distressed to Satisfied","opening_emotion":"one word","closing_emotion":"one word",'
+    +'"csat_prediction":4.2,"churn_risk":"Low","churn_risk_change":"Reduced from Medium",'
+    +'"resolution_status":"Fully Resolved","call_summary":"2-3 sentence paragraph",'
+    +'"key_customer_emotions":["e1","e2","e3"],"positive_signals":["s1","s2"],'
+    +'"risk_signals":["r1","r2"],"key_issues":["i1","i2","i3"],'
+    +'"agent_performance":"1-2 sentences","recommended_followup":"1-2 sentences",'
+    +'"crm_note":"ready-to-paste professional paragraph"}';
+  try{
+    var response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:prompt}]})
+    });
+    var data=await response.json();
+    var raw=data.content.map(function(c){return c.text||'';}).join('');
+    var clean=raw.replace(/```json|```/g,'').trim();
+    var result=JSON.parse(clean);
+    renderSummary(result);
+    summaryGenerated=true;
+    showT('&#10022;','g','Summary generated','AI call summary is ready');
+    document.querySelectorAll('.rp-tab').forEach(function(t){t.classList.remove('on');});
+    document.querySelectorAll('.rp-pane').forEach(function(p){p.classList.remove('on');});
+    document.querySelectorAll('.rp-tab')[2].classList.add('on');
+    document.getElementById('rp-summary').classList.add('on');
+  }catch(err){
+    console.error('Summary error:',err);
+    renderFallbackSummary();
+    summaryGenerated=true;
+  }finally{
+    btn.disabled=false;
+    icon.className=''; icon.textContent='&#10022;';
+    btn.childNodes[2].textContent=' Regenerate Summary';
+  }
+}
+
+function sentimentColor(emotion){
+  var e=(emotion||'').toLowerCase();
+  if(['distressed','frustrated','anxious','angry','upset'].some(function(x){return e.indexOf(x)>=0;}))return 'neg';
+  if(['relieved','satisfied','happy','calm','positive'].some(function(x){return e.indexOf(x)>=0;}))return 'pos';
+  return 'neu';
+}
+
+function renderSummary(r){
+  var churnCol=r.churn_risk==='Low'?'green':r.churn_risk==='Medium'?'amber':'red';
+  var resCol=r.resolution_status==='Fully Resolved'?'green':r.resolution_status==='Escalated'?'amber':'red';
+  var closingIsPos=r.closing_emotion&&(r.closing_emotion.toLowerCase().indexOf('sat')>=0||r.closing_emotion.toLowerCase().indexOf('rel')>=0);
+  var html='<div class="sum-out">'
+    +'<div class="sum-header">'
+      +'<div>'
+        +'<div class="sum-title-row" style="margin-bottom:3px"><div class="sum-overall">'+(r.overall_sentiment_journey||'Distressed to Satisfied')+'</div></div>'
+        +'<div style="font-size:10px;color:var(--t3)">'
+          +'<span style="color:'+(closingIsPos?'var(--green)':'var(--amber)')+'">Opened:</span> '+(r.opening_emotion||'Distressed')
+          +' &rarr; <span style="color:var(--green)">Closed:</span> '+(r.closing_emotion||'Relieved')
+        +'</div>'
+      +'</div>'
+      +'<div class="sum-csat"><div><div class="sum-csat-n">'+((r.csat_prediction||4.1).toFixed(1))+'</div><div class="sum-csat-d">/ 5.0 CSAT</div></div></div>'
+    +'</div>'
+    +'<div class="sum-body">'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Call narrative</div><div class="sum-text">'+(r.call_summary||'')+'</div></div>'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Customer emotions</div><div class="sum-chips">'
+        +(r.key_customer_emotions||[]).map(function(e){return '<span class="sum-chip '+sentimentColor(e)+'">'+e+'</span>';}).join('')
+      +'</div></div>'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Key issues</div><div class="sum-chips">'
+        +(r.key_issues||[]).map(function(i){return '<span class="sum-chip warn">'+i+'</span>';}).join('')
+      +'</div></div>'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Signals</div>'
+        +'<div class="sum-chips" style="margin-bottom:5px">'
+          +(r.positive_signals||[]).map(function(s){return '<span class="sum-chip pos">&#10003; '+s+'</span>';}).join('')
+        +'</div>'
+        +'<div class="sum-chips">'
+          +(r.risk_signals||[]).map(function(s){return '<span class="sum-chip neg">&#9888; '+s+'</span>';}).join('')
+        +'</div>'
+      +'</div>'
+      +'<div class="sum-section"><div class="sum-metrics">'
+        +'<div class="sum-metric"><div class="sum-metric-lbl">Resolution</div><div class="sum-metric-val '+resCol+'">'+(r.resolution_status||'Resolved')+'</div></div>'
+        +'<div class="sum-metric"><div class="sum-metric-lbl">Churn Risk</div><div class="sum-metric-val '+churnCol+'">'+(r.churn_risk||'Low')+' <span style="font-size:9px;font-weight:400;opacity:.7">'+(r.churn_risk_change||'')+'</span></div></div>'
+      +'</div></div>'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Agent performance</div><div class="sum-text">'+(r.agent_performance||'')+'</div></div>'
+      +'<div class="sum-section"><div class="sum-sec-lbl">Recommended follow-up</div><div class="sum-text">'+(r.recommended_followup||'')+'</div></div>'
+      +'<div class="sum-section">'
+        +'<div class="sum-sec-lbl" style="display:flex;align-items:center;justify-content:space-between">'
+          +'<span>CRM Note</span><span style="cursor:pointer;color:var(--blue);font-size:9px" onclick="copyCRM()">Copy &#8599;</span>'
+        +'</div>'
+        +'<div class="sum-text" id="crmNote" style="background:var(--s2);padding:8px;border-radius:4px;font-size:10px;font-family:var(--mono);color:var(--t2);line-height:1.7">'+(r.crm_note||'')+'</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="sum-actions">'
+      +'<button class="sum-act-btn" onclick="copyCRM()">&#128203; Copy CRM Note</button>'
+      +'<button class="sum-act-btn primary" onclick="saveSummary()">&#128190; Save to CRM</button>'
+    +'</div>'
+  +'</div>';
+  document.getElementById('sumOut').innerHTML=html;
+}
+
+function renderFallbackSummary(){
+  renderSummary({
+    overall_sentiment_journey:'Distressed to Relieved',
+    opening_emotion:'Distressed',
+    closing_emotion:'Relieved',
+    csat_prediction:4.1,
+    churn_risk:'Low',
+    churn_risk_change:'Reduced from Medium',
+    resolution_status:'Fully Resolved',
+    call_summary:'Marcus Henley contacted AusBank after being locked out of all digital channels following repeated failed login attempts. The agent demonstrated strong empathy by acknowledging the situation before proceeding to identity verification and account restoration. By the close of the call, the customer tone had shifted from distressed to relieved after full account access was restored.',
+    key_customer_emotions:['Distressed','Frustrated','Concerned','Relieved'],
+    positive_signals:['Cooperated with KYC verification','Accepted resolution without resistance'],
+    risk_signals:['Unrecognised device requires investigation','Prior fraud case FRD-8841 still open'],
+    key_issues:['Account locked across all digital channels','Unknown Samsung S24 in Parramatta','Biometric not enrolled on second device'],
+    agent_performance:'Agent Sarah Liu handled the call with high empathy, acknowledged the frustration early, and resolved the issue efficiently. Proactive communication about device security was noted positively.',
+    recommended_followup:'Send a follow-up SMS confirming account restoration. Escalate the unrecognised Samsung S24 device to the fraud team for investigation.',
+    crm_note:'Call: 10 Apr 2025 | Agent: AGB-2241 Sarah Liu | Outcome: Account unlocked (AUTH-UNLOCK-AGENT). Customer was distressed due to 7 failed login attempts resulting in full channel lockout. Identity verified via 100-pt KYC. Temp password issued via SMS (4hr expiry). Unrecognised Samsung S24 (AND-S24-9924, Parramatta) — customer denied ownership. Device blocked, forwarded to fraud review. Prior case FRD-8841 noted. CSAT predicted: 4.1/5. Churn risk: Low.'
+  });
+}
+
+function copyCRM(){
+  var note=document.getElementById('crmNote');
+  if(!note)return;
+  var txt=note.textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(function(){showT('&#128203;','b','Copied','CRM note copied to clipboard');}).catch(function(){showT('&#128203;','b','Note','Select and copy the text above');});
+  } else {
+    showT('&#128203;','b','Note','Select and copy the CRM note above');
+  }
+}
+
+function saveSummary(){
+  showT('&#128190;','g','Saved','Call summary saved to CRM record CALL-20250410-4821');
+  var c=document.getElementById('nec');
+  var t=new Date().toTimeString().slice(0,8);
+  var el=document.createElement('div');
+  el.className='ev suc new';
+  el.innerHTML='<div class="evdot suc"></div><div class="evm">'
+    +'<div class="evh"><div class="evn" style="color:var(--green)">CALL_SUMMARY_SAVED</div><div class="evt">'+t+'</div></div>'
+    +'<div class="evd">AI sentiment summary saved to CRM. CSAT: 4.1/5. Churn risk: Low. Resolution: Fully Resolved.</div>'
+    +'</div>';
+  c.insertBefore(el,c.firstChild);
+  document.querySelectorAll('#view-digital .tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.tpane').forEach(function(p){p.classList.remove('on');});
+  document.querySelector('#view-digital .tab').classList.add('on');
+  document.getElementById('ctab-events').classList.add('on');
+}
+
+// ── PAYMENT DATA ─────────────────────────────────────────────────────────────
+var pvC=[
+  {id:'c1',name:"James O'Brien",ini:'JO',acct:'ACC-003-8820-01',bsb:'062-123',
+   dob:'14 Mar 1982',phone:'+61 412 588 309',email:'j.obrien@gmail.com',
+   addr:'44 Harbour View Rd, Manly NSW 2095',joined:'12 Feb 2019',
+   tier:'Gold',f:4,sev:'crit',last:'2 min ago',
+   ct:'Visa',cn:'**** **** **** 7749',ce:'09/27',cl:'AUD 15,000',ca:'AUD 14,840',
+   av:'r',fr:'Gateway timeout / Insufficient credit',sess:'APP-iOS',
+   tl:[{t:'09:38',ty:'fail',l:'Payment Declined',a:'AUD 285.00',m:'Amazon AU',e:'GATEWAY_TIMEOUT'},
+       {t:'09:35',ty:'fail',l:'Payment Declined',a:'AUD 285.00',m:'Amazon AU',e:'CARD_DECLINED'},
+       {t:'09:31',ty:'fail',l:'Payment Declined',a:'AUD 285.00',m:'Amazon AU',e:'CARD_DECLINED'},
+       {t:'09:28',ty:'fail',l:'Payment Declined',a:'AUD 285.00',m:'Amazon AU',e:'CARD_DECLINED'},
+       {t:'09:10',ty:'ok',  l:'Payment Approved', a:'AUD 54.90', m:'Woolworths',e:null}]},
+  {id:'c2',name:'Priya Sharma',ini:'PS',acct:'ACC-002-5541-09',bsb:'083-902',
+   dob:'3 Sep 1990',phone:'+61 421 993 045',email:'priya.sharma@hotmail.com',
+   addr:'12B Collins St, Melbourne VIC 3000',joined:'7 Jul 2021',
+   tier:'Silver',f:2,sev:'warning',last:'11 min ago',
+   ct:'Mastercard',cn:'**** **** **** 3301',ce:'03/26',cl:'AUD 8,000',ca:'AUD 421',
+   av:'a',fr:'Near credit limit',sess:'Web Browser',
+   tl:[{t:'09:30',ty:'fail',l:'Payment Declined',a:'AUD 740.00',m:'JB Hi-Fi',e:'INSUFFICIENT_CREDIT'},
+       {t:'09:27',ty:'fail',l:'Payment Declined',a:'AUD 740.00',m:'JB Hi-Fi',e:'INSUFFICIENT_CREDIT'},
+       {t:'08:55',ty:'ok',  l:'Payment Approved', a:'AUD 89.00', m:'Coles',   e:null}]},
+  {id:'c3',name:'Michael Chen',ini:'MC',acct:'ACC-007-1193-04',bsb:'036-447',
+   dob:'22 Nov 1975',phone:'+61 430 114 782',email:'m.chen@chenlaw.com.au',
+   addr:'9 Queen St, Brisbane QLD 4000',joined:'5 Jan 2015',
+   tier:'Platinum',f:1,sev:'info',last:'23 min ago',
+   ct:'Visa',cn:'**** **** **** 5128',ce:'11/28',cl:'AUD 50,000',ca:'AUD 36,110',
+   av:'b',fr:'Suspected fraud flag',sess:'APP-Android',
+   tl:[{t:'09:18',ty:'fail',l:'Payment Blocked', a:'AUD 4,200.00',m:'Overseas Transfer',e:'FRAUD_SUSPECTED'},
+       {t:'09:01',ty:'ok',  l:'Payment Approved', a:'AUD 215.00', m:'Qantas',         e:null}]},
+  {id:'c4',name:'Natalie Ross',ini:'NR',acct:'ACC-001-6640-11',bsb:'082-157',
+   dob:'8 Jun 1988',phone:'+61 407 882 215',email:'natalie.ross@icloud.com',
+   addr:'88 Rundle Mall, Adelaide SA 5000',joined:'14 Oct 2020',
+   tier:'Silver',f:1,sev:'info',last:'31 min ago',
+   ct:'Mastercard',cn:'**** **** **** 8894',ce:'07/26',cl:'AUD 6,000',ca:'AUD 2,200',
+   av:'b',fr:'3DS authentication failure',sess:'Web Browser',
+   tl:[{t:'09:10',ty:'fail',l:'Auth Failure',    a:'AUD 319.00',m:'Catch.com.au',  e:'3DS_FAILED'},
+       {t:'08:40',ty:'ok',  l:'Payment Approved', a:'AUD 120.00',m:"Dan Murphy's",  e:null}]}
+];
+var pvSel='c1', pvRes=new Set();
+
+function pvInit(){
+  pvRL(); pvRD('c1');
+  setTimeout(function(){
+    pvC[0].f=5; pvC[0].last='Just now';
+    pvC[0].tl.unshift({t:'09:40',ty:'fail',l:'Payment Declined',a:'AUD 285.00',m:'Amazon AU',e:'GATEWAY_TIMEOUT'});
+    pvRL(); if(pvSel==='c1')pvRD('c1');
+    showT('&#9888;','red','New failure','James O\'Brien: 5 failed payments');
+    document.getElementById('pvBadge').textContent='5 Alerts';
+    document.getElementById('pmChip').textContent='5 ALERTS';
+  },12000);
+}
+
+function pvRL(){
+  var el=document.getElementById('pvList'); el.innerHTML='';
+  pvC.forEach(function(c){
+    var d=document.createElement('div');
+    var isOn=(c.id===pvSel);
+    var isRes=pvRes.has(c.id);
+    d.className='pac '+c.sev+(isOn?' on':'')+(isRes?' res':'');
+    var fc=c.sev==='crit'?'r':c.sev==='warning'?'a':'b';
+    var sc2=c.sev==='crit'?'var(--red)':c.sev==='warning'?'var(--amber)':'var(--blue)';
+    var sl=c.sev==='crit'?'CRITICAL':c.sev==='warning'?'WARNING':'MONITOR';
+    var resV=isRes?' <span style="font-size:9px;color:var(--green)">&#10003;</span>':'';
+    d.innerHTML='<div class="pact">'
+      +'<div class="pav '+c.av+'">'+c.ini+'</div>'
+      +'<div style="flex:1"><div class="pacn">'+c.name+resV+'</div><div class="paca">'+c.acct+'</div></div>'
+      +'<div class="pacf"><div class="pacfn '+fc+'">'+c.f+'</div><div class="pacfl">failures</div></div>'
+    +'</div>'
+    +'<div class="pacm">'
+      +'<span class="pacc" style="color:'+sc2+'">'+sl+'</span>'
+      +'<span class="pacc">'+c.sess+'</span>'
+      +'<span class="pacc">'+c.last+'</span>'
+    +'</div>';
+    d.onclick=function(){pvSel=c.id; pvRL(); pvRD(c.id);};
+    el.appendChild(d);
+  });
+}
+
+function pvRD(id){
+  var c=pvC.find(function(x){return x.id===id;}); if(!c)return;
+  var rp=document.getElementById('pvDetail');
+  var isRes=pvRes.has(c.id);
+  var fc=c.f>=3?'red':c.f>=2?'amber':'';
+  var tc=(c.tier==='Platinum'||c.tier==='Gold')?'var(--gold)':'var(--t2)';
+  var fn0=c.name.split(' ')[0];
+  var tlH=c.tl.map(function(t){
+    return '<div class="ptli">'
+      +'<div class="ptlt">'+t.t+'</div>'
+      +'<div class="ptldc"><div class="ptld '+t.ty+'"></div><div class="ptll"></div></div>'
+      +'<div>'
+        +'<div class="ptltit '+t.ty+'">'+t.l+'</div>'
+        +'<div class="ptlch">'
+          +'<span class="ptlc">'+t.a+'</span>'
+          +'<span class="ptlc">'+t.m+'</span>'
+          +(t.e?'<span class="ptlc err">'+t.e+'</span>':'')
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  var sc=c.sev==='crit'
+    ? '"Good morning, this is Sarah from AusBank. May I speak with '+fn0+'? We noticed difficulty with a recent payment and would like to help immediately."'
+    : '"Hello, this is Sarah from AusBank. I am reaching out to '+fn0+' regarding a recent transaction. Could we take a moment to verify a few details?"';
+  var actBtns=isRes
+    ? '<span style="color:var(--green);font-size:12px;font-weight:600">&#10003; Resolved</span>'
+    : '<button class="pb pbg" onclick="pvSMS(\''+c.id+'\')">SMS</button>'
+      +'<button class="pb pbg" onclick="pvResolve(\''+c.id+'\')">Resolve</button>'
+      +'<button class="pb pbe" onclick="pvEsc(\''+c.id+'\')">Escalate</button>'
+      +'<button class="pb pbc" onclick="pvCall(\''+c.id+'\')">&#128222; Call</button>';
+  var resolvedBlock='<div class="pvsc full" style="text-align:center;padding:24px;background:var(--green-bg);border-color:var(--green-bdr)">'
+    +'<div style="font-size:24px;margin-bottom:6px">&#10003;</div>'
+    +'<div style="font-size:14px;font-weight:700;color:var(--green)">Case resolved</div></div>';
+  var scriptBlock='<div class="pvsc full"><div class="slbl2">&#127897; Suggested script</div>'
+    +'<div class="sbox">'+sc+'</div>'
+    +'<div class="sacts">'
+      +'<button class="pb pbc" onclick="pvCall(\''+c.id+'\')">&#128222; Call now</button>'
+      +'<button class="pb pbp" onclick="pvSMS(\''+c.id+'\')">Send SMS</button>'
+      +'<button class="pb pbg" onclick="showT(\'&#128203;\',\'b\',\'Transcript\',\'Loaded in CRM panel\')">Transcript</button>'
+    +'</div></div>';
+  rp.innerHTML='<div class="pvdh">'
+    +'<div class="pvdht">'
+      +'<div class="pvdc">'
+        +'<div class="pvda pav '+c.av+'">'+c.ini+'</div>'
+        +'<div>'
+          +'<div class="pvdn">'+c.name+' <span style="font-size:13px;color:'+tc+';font-weight:400">&#183; '+c.tier+'</span></div>'
+          +'<div class="pvds">'+c.acct+' &#183; BSB '+c.bsb+' &#183; Joined '+c.joined+'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="pvdac">'+actBtns+'</div>'
+    +'</div>'
+    +'<div class="pvss">'
+      +'<div class="pvst"><div class="pvsl">Failed attempts</div><div class="pvsv '+fc+'">'+c.f+'</div><div class="pvsb">Last: '+c.last+'</div></div>'
+      +'<div class="pvst"><div class="pvsl">Failure reason</div><div class="pvsv" style="font-size:11px;line-height:1.3;color:var(--amber)">'+c.fr+'</div></div>'
+      +'<div class="pvst"><div class="pvsl">Available credit</div><div class="pvsv '+(c.ca.includes('421')?'amber':'')+'">'+c.ca+'</div><div class="pvsb">Limit: '+c.cl+'</div></div>'
+      +'<div class="pvst"><div class="pvsl">Active session</div><div class="pvsv" style="font-size:11px;color:var(--blue)">'+c.sess+'</div></div>'
+    +'</div>'
+  +'</div>'
+  +'<div class="pvdb">'
+    +'<div class="pvsc"><div class="pvscl">Customer details</div><div class="pvig">'
+      +'<div class="pvir"><span class="pvik">Name</span><span class="pviv">'+c.name+'</span></div>'
+      +'<div class="pvir"><span class="pvik">Date of birth</span><span class="pviv">'+c.dob+'</span></div>'
+      +'<div class="pvir"><span class="pvik">Phone</span><span class="pviv mono">'+c.phone+'</span></div>'
+      +'<div class="pvir"><span class="pvik">Email</span><span class="pviv" style="font-size:11px">'+c.email+'</span></div>'
+      +'<div class="pvir" style="grid-column:1/-1"><span class="pvik">Address</span><span class="pviv">'+c.addr+'</span></div>'
+    +'</div></div>'
+    +'<div class="pvsc"><div class="pvscl">Credit card</div>'
+      +'<div class="cardv">'
+        +'<div class="cnet">'+c.ct+'</div>'
+        +'<div class="cnum">'+c.cn+'</div>'
+        +'<div class="cbot"><div class="chold">'+c.name+'</div>'
+          +'<div style="text-align:right"><div class="celb">EXPIRES</div><div class="cel">'+c.ce+'</div></div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="pvig">'
+        +'<div class="pvir"><span class="pvik">Type</span><span class="pviv">'+c.ct+'</span></div>'
+        +'<div class="pvir"><span class="pvik">Limit</span><span class="pviv mono">'+c.cl+'</span></div>'
+        +'<div class="pvir"><span class="pvik">Number</span><span class="pviv mono">'+c.cn+'</span></div>'
+        +'<div class="pvir"><span class="pvik">Available</span><span class="pviv mono '+(c.ca.includes('421')?'red':'')+'">'+c.ca+'</span></div>'
+      +'</div>'
+    +'</div>'
+    +(isRes?resolvedBlock:scriptBlock)
+    +'<div class="pvsc full"><div class="pvscl">Payment history</div><div class="ptl">'+tlH+'</div></div>'
+  +'</div>';
+}
+
+function pvCall(id){
+  var c=pvC.find(function(x){return x.id===id;});
+  showModal('&#128222;','g','Call '+c.name,'Dialling <strong>'+c.phone+'</strong>. Call recorded for quality.','Begin call',
+    function(){showT('&#128222;','g','Connected',fn0+' &#183; '+c.phone);});
+}
+function pvSMS(id){
+  var c=pvC.find(function(x){return x.id===id;});
+  showModal('&#128172;','b','SMS to '+c.name.split(' ')[0],'Alert to <strong>'+c.phone+'</strong> re payment failures.','Send SMS',
+    function(){showT('&#10003;','g','SMS sent','Delivered to '+c.phone);});
+}
+function pvEsc(id){
+  var c=pvC.find(function(x){return x.id===id;});
+  showModal('&#11014;','b','Escalate','Transfer '+c.name+' case to Payments Specialist.','Escalate',
+    function(){showT('&#11014;','b','Escalated',c.name+' sent to specialist queue');});
+}
+function pvResolve(id){
+  pvRes.add(id);
+  if(id==='c1')document.getElementById('pvAlert').classList.add('hidden');
+  pvRL(); pvRD(id);
+  showT('&#10003;','g','Resolved','Payment issue marked as resolved');
+  var rem=pvC.filter(function(c){return !pvRes.has(c.id);}).length;
+  document.getElementById('pvBadge').textContent=rem+' Alert'+(rem!==1?'s':'');
+  document.getElementById('pmChip').textContent=rem+' ALERT'+(rem!==1?'S':'');
+}
+function pvConnectNow(){pvSel='c1'; pvRL(); pvRD('c1'); pvCall('c1');}
+
+</script>
