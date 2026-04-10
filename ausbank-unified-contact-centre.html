@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AusBank — Unified Contact Centre Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   MASTER DESIGN TOKENS — AusBank Platform
+═══════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  /* Navy scale */
+  --navy:#0B1929;  --navy2:#0F1F33;  --navy3:#132840;
+  --navy4:#1A3350; --navy5:#1E3A5A;  --navy-mid:#0f2040;
+  --panel:#111e35; --panel-raise:#162540;
+  /* Brand */
+  --gold:#C9933A;  --gold2:#E8B560;  --gold3:#7A5520;  --gold4:#3A2410;
+  --gold-faint:rgba(201,147,58,0.12);
+  /* Semantic */
+  --red:#E05252;   --red2:#3D1515;   --red3:#1A0808;
+  --red-faint:rgba(226,75,74,0.12);  --red-bright:rgba(226,75,74,0.25);
+  --green:#3DB87A; --green2:#0F3020; --green3:#071810;
+  --green-faint:rgba(61,158,110,0.12);
+  --amber:#E8A535; --amber2:#3A2800; --amber3:#1A1200;
+  --amber-faint:rgba(224,154,34,0.12);
+  --blue:#4A9FE8;  --blue2:#0A1F38;  --blue3:#051020;
+  --blue-acc:#3b8bd4; --blue-faint:rgba(59,139,212,0.12);
+  --purple:#9B72E8; --purple2:#1A0F38;
+  /* Text */
+  --tp:#E8EDF2; --ts:#8AA4BF; --td:#4A6880;
+  --text-primary:#e8eaf0; --text-secondary:#8fa0bc; --text-muted:#4f6180;
+  /* Borders */
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --border-bright:rgba(255,255,255,0.15);
+  --gold-border:rgba(201,147,58,0.25);
+  /* Shape */
+  --radius:8px; --radius2:12px; --r:8px; --r-lg:12px;
+  /* Fonts */
+  --font:'Syne',sans-serif; --mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--navy);}
+body{font-family:var(--font);color:var(--tp);font-size:13px;}
+
+/* ═══════════════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════════════ */
+#loginScreen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(201,147,58,.08),transparent 70%),radial-gradient(ellipse 40% 60% at 80% 80%,rgba(74,159,232,.05),transparent 60%);}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;}
+.login-card{position:relative;background:var(--navy2);border:1px solid var(--border2);border-radius:20px;padding:40px 44px;width:420px;box-shadow:0 40px 80px rgba(0,0,0,.5),0 0 0 1px rgba(201,147,58,.1);}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.login-logo-mark{width:48px;height:48px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.login-logo-mark svg{width:28px;height:28px;}
+.login-logo-text .brand{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+.login-logo-text .sub{font-size:10px;color:var(--ts);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.login-title{font-size:18px;font-weight:700;margin-bottom:5px;}
+.login-subtitle{font-size:12px;color:var(--ts);margin-bottom:24px;line-height:1.55;}
+.field-group{margin-bottom:14px;}
+.field-group label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ts);display:block;margin-bottom:5px;font-weight:600;}
+.field-group input{width:100%;background:var(--navy3);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;color:var(--tp);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s;}
+.field-group input:focus{border-color:var(--gold3);}
+.field-group input::placeholder{color:var(--td);}
+.login-btn{width:100%;background:var(--gold);border:none;border-radius:var(--r);padding:12px;color:var(--navy);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.5px;margin-top:6px;}
+.login-btn:hover{background:var(--gold2);}
+.login-footer{text-align:center;margin-top:18px;font-size:11px;color:var(--td);}
+.login-footer span{color:var(--gold);cursor:pointer;}
+.login-error{background:var(--red3);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:8px 12px;font-size:11px;margin-bottom:12px;display:none;}
+/* Role selector */
+.role-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.role-btn{background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);padding:10px;text-align:center;cursor:pointer;transition:all .2s;}
+.role-btn.active,.role-btn:hover{border-color:var(--gold3);background:var(--navy4);}
+.role-btn .ri{font-size:18px;display:block;margin-bottom:3px;}
+.role-btn .rl{font-size:10px;color:var(--ts);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+
+/* ═══════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════ */
+#app{display:none;height:100vh;flex-direction:column;}
+#app.visible{display:flex;}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:10;position:relative;}
+.logo-mark{width:30px;height:30px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.logo-mark svg{width:18px;height:18px;}
+.logo-name{font-size:15px;font-weight:800;letter-spacing:-.3px;}
+.logo-sub{font-size:9px;color:var(--ts);letter-spacing:1.5px;text-transform:uppercase;}
+.tb-div{width:1px;height:24px;background:var(--border);margin:0 2px;flex-shrink:0;}
+
+/* View switcher */
+.view-switcher{display:flex;gap:2px;background:var(--navy3);border:1px solid var(--border);border-radius:10px;padding:3px;flex-shrink:0;}
+.vs-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;color:var(--ts);cursor:pointer;transition:all .2s;white-space:nowrap;border:none;background:transparent;font-family:var(--font);letter-spacing:.3px;}
+.vs-btn:hover{color:var(--tp);background:var(--navy4);}
+.vs-btn.active{background:var(--navy5);color:var(--gold2);border:1px solid var(--gold-border);}
+.vs-btn .vi{font-size:13px;}
+.vs-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;background:var(--red2);color:var(--red);border:1px solid rgba(224,82,82,.4);animation:pulse-badge 1.5s infinite;}
+.vs-badge.amber{background:var(--amber2);color:var(--amber);border-color:rgba(232,165,53,.4);}
+@keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:.5}}
+
+.call-badge{background:var(--red2);border:1px solid var(--red);color:var(--red);font-size:10px;letter-spacing:.8px;padding:3px 9px;border-radius:4px;font-weight:700;display:flex;align-items:center;gap:5px;text-transform:uppercase;flex-shrink:0;}
+.call-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.call-timer{font-family:var(--mono);font-size:13px;color:var(--tp);font-weight:500;min-width:58px;}
+.cust-quick{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--navy3);border:1px solid var(--border);border-radius:6px;}
+.cust-quick-name{font-size:12px;font-weight:600;}
+.cust-quick-id{font-size:10px;color:var(--td);font-family:var(--mono);}
+.tb-clock{font-family:var(--mono);font-size:12px;color:var(--ts);background:var(--navy3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.queue-pill{background:var(--amber2);border:1px solid var(--amber);color:var(--amber);font-size:10px;padding:3px 8px;border-radius:4px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.tb-icon-btn{width:30px;height:30px;border-radius:6px;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:background .2s;}
+.tb-icon-btn:hover{background:var(--navy4);}
+.agent-pill{display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--navy3);border:1px solid var(--border);border-radius:20px;cursor:pointer;}
+.agent-av{width:24px;height:24px;border-radius:50%;background:var(--navy5);border:1.5px solid var(--gold3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold);}
+.agent-n{font-size:11px;font-weight:600;}
+.status-online{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+/* ── VIEW CONTAINERS ── */
+.view{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.view.active{display:flex;}
+
+/* ═══════════════════════════════════════════════════
+   VIEW 1 — DIGITAL ACCESS CENTRE
+═══════════════════════════════════════════════════ */
+.workspace{display:grid;grid-template-columns:290px 1fr 310px;height:100%;overflow:hidden;}
+/* Left panel */
+.panel{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--navy2);}
+.panel-hdr{padding:10px 14px 9px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.panel-title-sm{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ts);font-weight:700;}
+.panel-body{flex:1;overflow-y:auto;padding:12px 14px;}
+.panel-body::-webkit-scrollbar{width:3px;}
+.panel-body::-webkit-scrollbar-thumb{background:var(--navy4);border-radius:2px;}
+/* Customer card */
+.cust-card{background:var(--navy3);border:1px solid var(--gold-border);border-radius:var(--radius2);padding:14px;margin-bottom:12px;}
+.cust-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cust-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--navy5),var(--navy4));border:2px solid var(--gold3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--gold2);flex-shrink:0;}
+.cust-name{font-size:15px;font-weight:700;line-height:1.2;}
+.cust-id{font-size:10px;color:var(--td);font-family:var(--mono);margin-top:3px;}
+.risk-tag{margin-left:auto;background:var(--red2);border:1px solid var(--red);color:var(--red);font-size:9px;padding:3px 7px;border-radius:4px;letter-spacing:.5px;font-weight:700;white-space:nowrap;}
+.cust-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.cust-field label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--td);display:block;margin-bottom:2px;}
+.cust-field span{font-size:11px;color:var(--tp);font-weight:500;}
+/* Risk bar */
+.risk-block{margin-bottom:12px;}
+.risk-lbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.risk-lbl span:first-child{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--ts);font-weight:600;}
+.risk-val{font-size:12px;font-weight:700;color:var(--red);}
+.risk-bar{height:5px;background:var(--navy5);border-radius:3px;overflow:hidden;}
+.risk-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--amber),var(--red));transition:width .6s ease;}
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;}
+.stat{background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);padding:9px 8px;text-align:center;}
+.stat-n{font-size:22px;font-weight:700;line-height:1;font-family:var(--mono);}
+.stat-l{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--td);margin-top:3px;}
+.stat.danger .stat-n{color:var(--red);}
+.stat.warn .stat-n{color:var(--amber);}
+.stat.info .stat-n{color:var(--blue);}
+/* Section header */
+.sec-hdr{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--td);margin:12px 0 7px;font-weight:700;display:flex;align-items:center;gap:6px;}
+.sec-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Timeline */
+.tl-item{display:flex;gap:10px;padding:6px 0;position:relative;}
+.tl-item::before{content:'';position:absolute;left:11px;top:26px;bottom:-6px;width:1px;background:var(--border);}
+.tl-item:last-child::before{display:none;}
+.tl-icon{width:23px;height:23px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px;}
+.tl-icon.fail{background:var(--red2);border:1px solid rgba(224,82,82,.6);}
+.tl-icon.warn{background:var(--amber2);border:1px solid rgba(232,165,53,.6);}
+.tl-icon.ok{background:var(--green2);border:1px solid rgba(61,184,122,.6);}
+.tl-icon.info{background:var(--blue2);border:1px solid rgba(74,159,232,.6);}
+.tl-title{font-size:11px;font-weight:600;color:var(--tp);line-height:1.3;}
+.tl-meta{font-size:10px;color:var(--td);margin-top:2px;font-family:var(--mono);}
+.tl-badge{display:inline-block;font-size:9px;padding:1px 5px;border-radius:3px;margin-top:3px;font-weight:700;letter-spacing:.5px;}
+.tl-badge.live{background:var(--red2);color:var(--red);border:1px solid var(--red);animation:pulse 1.5s infinite;}
+.tl-badge.new-dev{background:var(--blue2);color:var(--blue);border:1px solid rgba(74,159,232,.5);}
+.tl-badge.ok{background:var(--green2);color:var(--green);border:1px solid rgba(61,184,122,.5);}
+/* Centre column */
+.center-col{display:flex;flex-direction:column;overflow:hidden;background:var(--navy);flex:1;}
+.alert-bar{background:#1A0808;border-bottom:1px solid var(--red);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.alert-icon-box{width:20px;height:20px;background:var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;flex-shrink:0;}
+.alert-msg{font-size:11px;color:#F5A0A0;line-height:1.4;}
+.alert-msg strong{color:var(--red);}
+.summary-bar{display:flex;gap:6px;padding:8px 16px;background:var(--navy2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;}
+.summary-bar::-webkit-scrollbar{display:none;}
+.sum-pill{background:var(--navy3);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--ts);white-space:nowrap;display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.sum-pill .dot{width:6px;height:6px;border-radius:50%;}
+/* Centre tabs */
+.c-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--navy2);}
+.c-tab{padding:10px 14px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;font-weight:600;user-select:none;}
+.c-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.c-tab:hover:not(.active){color:var(--ts);}
+.c-tab-content{display:none;flex:1;overflow-y:auto;padding:14px 16px;}
+.c-tab-content.active{display:block;}
+.c-tab-content::-webkit-scrollbar{width:3px;}
+.c-tab-content::-webkit-scrollbar-thumb{background:var(--navy4);border-radius:2px;}
+.live-feed-hdr{display:flex;align-items:center;gap:6px;padding:6px 16px;background:var(--navy2);border-bottom:1px solid var(--border);flex-shrink:0;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.live-text{font-size:10px;color:var(--green);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.live-count{font-family:var(--mono);font-size:10px;color:var(--td);margin-left:auto;}
+/* Event cards */
+.ev-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
+.ev-card.critical{border-color:rgba(224,82,82,.35);background:rgba(26,8,8,.7);}
+.ev-card.warning{border-color:rgba(232,165,53,.25);background:rgba(26,18,0,.5);}
+.ev-card.success{border-color:rgba(61,184,122,.3);background:rgba(7,24,16,.5);}
+.ev-card.info{border-color:rgba(74,159,232,.2);background:rgba(5,16,32,.4);}
+.ev-card.new{animation:slideIn .3s ease-out;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.ev-dot.critical{background:var(--red);box-shadow:0 0 8px rgba(224,82,82,.4);}
+.ev-dot.warning{background:var(--amber);}
+.ev-dot.success{background:var(--green);}
+.ev-dot.info{background:var(--blue);}
+.ev-dot.agent{background:var(--purple);}
+.ev-hdr{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.ev-name{font-size:11px;font-weight:700;font-family:var(--mono);}
+.ev-time{font-family:var(--mono);font-size:10px;color:var(--td);margin-left:auto;}
+.ev-desc{font-size:11px;color:var(--ts);line-height:1.5;}
+.ev-data{margin-top:6px;background:var(--navy);border:1px solid var(--border);border-radius:5px;padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--td);line-height:1.8;}
+.ev-data span{color:var(--gold2);}
+/* Device cards */
+.device-card{background:var(--navy2);border:1px solid var(--border);border-radius:var(--radius2);padding:14px;margin-bottom:10px;}
+.device-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.device-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.device-name{font-size:13px;font-weight:700;}
+.device-sub{font-size:10px;color:var(--td);margin-top:2px;}
+.device-status{margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.device-status.trusted{background:var(--green2);border:1px solid rgba(61,184,122,.4);color:var(--green);}
+.device-status.unknown{background:var(--amber2);border:1px solid rgba(232,165,53,.4);color:var(--amber);}
+.device-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.device-field label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--td);display:block;margin-bottom:2px;}
+.device-field span{font-size:10px;color:var(--tp);font-family:var(--mono);}
+/* Call history */
+.call-row{background:var(--navy2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .2s;}
+.call-row:hover{border-color:var(--border2);}
+.call-row-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.call-date{font-size:10px;color:var(--td);font-family:var(--mono);}
+.call-reason{font-size:11px;font-weight:600;flex:1;}
+.call-dur{font-family:var(--mono);font-size:10px;color:var(--ts);}
+.call-outcome{font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;}
+.call-outcome.resolved{background:var(--green2);color:var(--green);}
+.call-outcome.escalated{background:var(--amber2);color:var(--amber);}
+.call-notes{font-size:10px;color:var(--ts);line-height:1.4;}
+/* Agent input bar */
+.agent-bar{padding:10px 16px;border-top:1px solid var(--border);background:var(--navy2);flex-shrink:0;}
+.agent-bar-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.agent-bar-hdr label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--td);font-weight:700;}
+.char-count{font-size:10px;color:var(--td);font-family:var(--mono);}
+.input-row{display:flex;gap:8px;}
+.agent-input{flex:1;background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;color:var(--tp);font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s;height:36px;}
+.agent-input:focus{border-color:var(--gold3);}
+.agent-input::placeholder{color:var(--td);}
+.quick-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.chip{background:var(--navy3);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:10px;color:var(--ts);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.chip:hover{border-color:var(--gold3);color:var(--gold2);}
+/* Right AI panel */
+.ai-panel{display:flex;flex-direction:column;overflow:hidden;background:var(--navy2);}
+.action-card{background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;}
+.action-card.featured{border-color:var(--gold-border);}
+.action-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.action-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700;border:1px solid;}
+.action-tag.high{background:var(--red2);color:var(--red);border-color:rgba(224,82,82,.4);}
+.action-tag.med{background:var(--amber2);color:var(--amber);border-color:rgba(232,165,53,.4);}
+.action-tag.low{background:var(--blue2);color:var(--blue);border-color:rgba(74,159,232,.4);}
+.action-tag.opt{background:var(--navy4);color:var(--ts);border-color:var(--border);}
+.action-title-text{font-size:12px;font-weight:700;}
+.action-desc{font-size:10px;color:var(--ts);line-height:1.5;}
+.action-done-btn{margin-top:7px;background:transparent;border:1px solid var(--border);color:var(--ts);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--font);transition:all .2s;font-weight:500;}
+.action-done-btn:hover{border-color:var(--gold3);color:var(--gold2);}
+.action-done-btn.done{border-color:rgba(61,184,122,.4);color:var(--green);cursor:default;}
+.channels-block{background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px;}
+.ch-row{display:flex;align-items:center;gap:10px;padding:8px 11px;border-bottom:1px solid var(--border);}
+.ch-row:last-child{border-bottom:none;}
+.ch-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ch-name{font-size:11px;font-weight:600;}
+.ch-detail{font-size:10px;color:var(--td);margin-top:1px;}
+.ch-status{font-size:10px;font-weight:700;margin-left:auto;white-space:nowrap;}
+.ch-status.ok{color:var(--green);}
+.ch-status.fail{color:var(--red);}
+.kb-card{background:var(--navy3);border:1px solid var(--blue2);border-left:3px solid var(--blue);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;}
+.kb-title{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;}
+.kb-steps{list-style:none;counter-reset:kbs;}
+.kb-steps li{counter-increment:kbs;font-size:10px;color:var(--ts);padding:3px 0 3px 18px;position:relative;line-height:1.5;border-bottom:1px solid var(--border);}
+.kb-steps li:last-child{border-bottom:none;}
+.kb-steps li::before{content:counter(kbs);position:absolute;left:0;top:4px;color:var(--gold);font-weight:700;font-size:9px;width:14px;height:14px;border-radius:3px;background:var(--gold4);display:flex;align-items:center;justify-content:center;text-align:center;line-height:14px;}
+.kb-card.fraud{border-left-color:var(--amber);}
+.kb-card.fraud .kb-title{color:var(--amber);}
+.kb-card.fraud .kb-steps li::before{color:var(--amber);background:var(--amber3);}
+.sentiment-block{background:var(--navy3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;}
+.sent-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:10px;}
+.sent-bar-wrap{height:4px;background:var(--navy5);border-radius:2px;overflow:hidden;margin-bottom:8px;}
+.sent-bar{height:100%;border-radius:2px;transition:width .5s;}
+
+/* ═══════════════════════════════════════════════════
+   VIEW 2 — PAYMENT MONITORING (from prep.html)
+═══════════════════════════════════════════════════ */
+.pv-shell{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+/* Payment alert banner */
+.pv-banner{background:var(--red-bright);border-bottom:2px solid var(--red);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;animation:banner-pulse 1.5s ease-in-out infinite;flex-shrink:0;}
+.pv-banner.hidden{display:none;}
+@keyframes banner-pulse{0%,100%{background:rgba(226,75,74,.2)}50%{background:rgba(226,75,74,.35)}}
+.pv-banner-left{display:flex;align-items:center;gap:12px;}
+.pv-banner-icon{width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.pv-banner-title{font-size:14px;font-weight:700;color:#ff8a88;}
+.pv-banner-sub{font-size:12px;color:var(--ts);margin-top:1px;}
+.pv-connect-btn{background:var(--red);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.pv-connect-btn:hover{opacity:.85;}
+/* Layout */
+.pv-layout{display:grid;grid-template-columns:320px 1fr;flex:1;overflow:hidden;}
+/* Left list */
+.pv-left{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.pv-panel-hdr{padding:14px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pv-panel-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--ts);}
+.pv-badge{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;}
+.pv-badge-red{background:var(--red-faint);color:var(--red);border:1px solid rgba(226,75,74,.3);}
+.pv-badge-amber{background:var(--amber-faint);color:var(--amber);border:1px solid rgba(224,154,34,.3);}
+.pv-badge-blue{background:var(--blue-faint);color:var(--blue-acc);border:1px solid rgba(59,139,212,.3);}
+.pv-list{overflow-y:auto;flex:1;padding:10px;display:flex;flex-direction:column;gap:7px;}
+.pv-list::-webkit-scrollbar{width:3px;}
+.pv-list::-webkit-scrollbar-thumb{background:var(--navy4);border-radius:2px;}
+/* Customer alert cards */
+.cust-alert-card{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden;}
+.cust-alert-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.cust-alert-card.critical::before{background:var(--red);}
+.cust-alert-card.warning::before{background:var(--amber);}
+.cust-alert-card.info::before{background:var(--blue-acc);}
+.cust-alert-card.critical{border-color:rgba(226,75,74,.3);}
+.cust-alert-card.warning{border-color:rgba(224,154,34,.25);}
+.cust-alert-card.active{background:var(--panel-raise);border-color:var(--gold);}
+.cust-alert-card:hover:not(.active){border-color:var(--border-bright);background:#192d4d;}
+.cust-alert-card.resolved{opacity:.5;}
+.cust-alert-card.resolved::before{background:var(--td);}
+.card-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.av-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#fff;}
+.av-red{background:rgba(226,75,74,.3);border:1.5px solid var(--red);color:#ff8a88;}
+.av-amber{background:rgba(224,154,34,.25);border:1.5px solid var(--amber);color:var(--amber);}
+.av-blue{background:rgba(59,139,212,.2);border:1.5px solid var(--blue-acc);color:var(--blue-acc);}
+.card-name-block{margin-left:10px;flex:1;}
+.card-cname{font-size:14px;font-weight:600;line-height:1.3;}
+.card-acct{font-size:11px;color:var(--td);font-family:var(--mono);margin-top:2px;}
+.fail-badge{display:flex;align-items:center;gap:5px;background:var(--red-faint);border:1px solid rgba(226,75,74,.3);border-radius:6px;padding:4px 8px;flex-shrink:0;}
+.fail-badge .fc{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--red);}
+.fail-badge .fl{font-size:10px;color:var(--ts);line-height:1.2;}
+.fail-badge.amber-bg{background:var(--amber-faint);border-color:rgba(224,154,34,.3);}
+.fail-badge.amber-bg .fc{color:var(--amber);}
+.card-meta-row{display:flex;gap:7px;flex-wrap:wrap;}
+.meta-chip{font-size:11px;color:var(--td);background:rgba(255,255,255,.04);border-radius:4px;padding:2px 6px;font-family:var(--mono);}
+.pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:4px;animation:pulse-dot 1.2s ease-in-out infinite;}
+.pulse-dot.amber{background:var(--amber);}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+/* Right detail */
+.pv-right{display:flex;flex-direction:column;overflow:hidden;background:var(--navy);}
+.detail-header{padding:18px 24px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--panel);}
+.detail-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.detail-cust-info{display:flex;align-items:center;gap:14px;}
+.detail-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;}
+.detail-name{font-size:20px;font-weight:700;letter-spacing:-.3px;}
+.detail-subtitle{font-size:12px;color:var(--ts);margin-top:3px;}
+.detail-actions-row{display:flex;gap:8px;flex-wrap:wrap;}
+/* Buttons for payment view */
+.pv-btn{border-radius:var(--r);padding:8px 16px;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);transition:all .15s;}
+.pv-btn-ghost{background:transparent;color:var(--ts);}
+.pv-btn-ghost:hover{background:var(--panel-raise);color:var(--tp);border-color:var(--border-bright);}
+.pv-btn-primary{background:var(--blue-acc);color:#fff;border-color:transparent;}
+.pv-btn-primary:hover{opacity:.88;}
+.pv-btn-call{background:var(--green);color:#fff;border-color:transparent;}
+.pv-btn-call:hover{opacity:.88;}
+.pv-btn-escalate{background:var(--red-faint);color:var(--red);border-color:rgba(226,75,74,.4);}
+.pv-btn-escalate:hover{background:var(--red-bright);}
+/* Stat strip */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.stat-box{background:var(--navy-mid);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;}
+.stat-label{font-size:11px;color:var(--td);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.stat-value{font-family:var(--mono);font-size:20px;font-weight:500;}
+.stat-value.red{color:var(--red);}
+.stat-value.amber{color:var(--amber);}
+.stat-value.green{color:var(--green);}
+.stat-sub{font-size:11px;color:var(--td);margin-top:2px;}
+/* Detail body */
+.detail-body{flex:1;overflow-y:auto;padding:18px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start;}
+.detail-body::-webkit-scrollbar{width:3px;}
+.detail-body::-webkit-scrollbar-thumb{background:var(--navy4);border-radius:2px;}
+.section-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;}
+.section-card.full-width{grid-column:1/-1;}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--td);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
+.info-row{display:flex;flex-direction:column;gap:2px;}
+.info-key{font-size:11px;color:var(--td);}
+.info-val{font-size:13px;font-weight:500;}
+.info-val.mono{font-family:var(--mono);font-size:12px;}
+.info-val.red{color:var(--red);}
+/* Card visual */
+.card-visual{background:linear-gradient(135deg,#1a3060,#0f2040);border:1px solid var(--border-bright);border-radius:10px;padding:16px;aspect-ratio:1.586;position:relative;overflow:hidden;margin-bottom:12px;}
+.card-visual::before{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:rgba(212,168,67,.08);}
+.card-visual::after{content:'';position:absolute;right:10px;top:10px;width:80px;height:80px;border-radius:50%;background:rgba(212,168,67,.05);}
+.card-network{font-size:11px;font-weight:600;color:var(--gold);letter-spacing:1px;text-transform:uppercase;}
+.card-number-vis{font-family:var(--mono);font-size:14px;letter-spacing:2px;margin-top:18px;color:rgba(255,255,255,.8);}
+.card-bottom-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;}
+.card-holder-name{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.7);}
+.card-expiry-block{text-align:right;}
+.card-expiry-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.5px;}
+.card-expiry{font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.7);}
+/* Payment timeline */
+.pay-timeline{display:flex;flex-direction:column;gap:0;}
+.pay-tl-item{display:grid;grid-template-columns:64px 16px 1fr;gap:0 12px;align-items:start;padding-bottom:14px;position:relative;}
+.pay-tl-item:last-child{padding-bottom:0;}
+.pay-tl-time{font-family:var(--mono);font-size:11px;color:var(--td);text-align:right;padding-top:2px;}
+.pay-tl-dot-col{display:flex;flex-direction:column;align-items:center;}
+.pay-tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.pay-tl-dot.fail{border-color:var(--red);background:var(--red-faint);}
+.pay-tl-dot.fail::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);}
+.pay-tl-dot.ok{border-color:var(--green);background:var(--green-faint);}
+.pay-tl-dot.ok::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.pay-tl-line{flex:1;width:1px;background:var(--border);margin-top:4px;min-height:20px;}
+.pay-tl-item:last-child .pay-tl-line{display:none;}
+.pay-tl-title{font-size:13px;font-weight:500;margin-bottom:4px;}
+.pay-tl-title.fail{color:var(--red);}
+.pay-tl-title.ok{color:var(--green);}
+.pay-tl-chips{display:flex;gap:8px;flex-wrap:wrap;}
+.pay-tl-chip{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.04);color:var(--ts);border:1px solid var(--border);}
+.pay-tl-chip.err{background:var(--red-faint);color:var(--red);border-color:rgba(226,75,74,.3);}
+/* Agent prompt */
+.agent-prompt{grid-column:1/-1;background:rgba(59,139,212,.08);border:1px solid rgba(59,139,212,.3);border-radius:var(--r-lg);padding:16px 18px;}
+.agent-prompt-title{font-size:13px;font-weight:700;color:#7ec0f2;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.script-box{background:rgba(0,0,0,.2);border-radius:var(--r);padding:12px 14px;font-size:13px;line-height:1.65;color:var(--ts);border:1px solid var(--border);margin-bottom:12px;font-style:italic;}
+.script-box strong{color:var(--tp);font-style:normal;}
+.prompt-actions{display:flex;gap:8px;flex-wrap:wrap;}
+/* Status bar */
+.pv-status-bar{background:var(--navy-mid);border-top:1px solid var(--border);padding:7px 20px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--td);flex-shrink:0;}
+.pv-status-items{display:flex;gap:18px;align-items:center;}
+.pv-sdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;}
+.pv-sdot.green{background:var(--green);}
+.pv-sdot.red{background:var(--red);animation:pulse-dot 1.2s infinite;}
+
+/* ═══════════════════════════════════════════════════
+   SHARED — MODAL, TOAST
+═══════════════════════════════════════════════════ */
+/* Unified modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(5,10,20,.85);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open,.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal-box{background:var(--panel);border:1px solid var(--border-bright);border-radius:16px;padding:28px;width:440px;max-width:90vw;transform:translateY(10px) scale(.97);transition:transform .2s;}
+.modal-overlay.open .modal-box,.modal-overlay.show .modal-box{transform:none;}
+.modal-icon-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;}
+.modal-icon-circle.green{background:var(--green-faint);border:1.5px solid var(--green);}
+.modal-icon-circle.blue{background:var(--blue-faint);border:1.5px solid var(--blue-acc);}
+.modal-icon-circle.red{background:var(--red-faint);border:1.5px solid var(--red);}
+.modal-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:8px;}
+.modal-body-text{font-size:14px;color:var(--ts);text-align:center;line-height:1.6;margin-bottom:24px;}
+.modal-actions-row{display:flex;gap:10px;justify-content:center;}
+.btn-modal-cancel{background:transparent;border:1px solid var(--border-bright);color:var(--ts);border-radius:var(--r);padding:10px 24px;font-family:var(--font);font-size:14px;cursor:pointer;}
+.btn-modal-cancel:hover{background:var(--panel-raise);}
+.btn-modal-confirm{border:none;border-radius:var(--r);padding:10px 24px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;color:#fff;}
+.btn-modal-confirm.green{background:var(--green);}
+.btn-modal-confirm.blue{background:var(--blue-acc);}
+.btn-modal-confirm.red{background:var(--red);}
+/* Unified toast */
+.toast-unified{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--border-bright);border-radius:var(--r-lg);padding:14px 18px;max-width:320px;z-index:600;transform:translateY(20px);opacity:0;transition:all .3s;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.toast-unified.show{transform:translateY(0);opacity:1;}
+.toast-unified.green-toast{border-color:rgba(61,158,110,.4);}
+.toast-unified.blue-toast{border-color:rgba(59,139,212,.4);}
+.toast-unified.red-toast{border-color:rgba(224,82,82,.4);}
+.toast-unified.success{border-color:rgba(61,158,110,.4);}
+.toast-unified.warning{border-color:rgba(232,165,53,.35);}
+.toast-unified.info{border-color:rgba(74,159,232,.3);}
+.toast-icon-el{font-size:18px;margin-bottom:7px;display:block;}
+.toast-title-el{font-weight:700;margin-bottom:4px;font-size:13px;}
+.toast-body-el{color:var(--ts);font-size:12px;}
+
+/* Shared buttons */
+.btn-primary-gold{background:var(--gold);border:none;border-radius:var(--r);padding:8px 16px;color:var(--navy);font-family:var(--font);font-size:11px;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.5px;}
+.btn-primary-gold:hover{background:var(--gold2);}
+.btn-ghost-sm{background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;color:var(--ts);font-family:var(--font);font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-ghost-sm:hover{border-color:var(--border2);color:var(--tp);}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--navy4);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">
+        <svg viewBox="0 0 28 28" fill="none"><path d="M14 3L25 8.5V19.5L14 25L3 19.5V8.5L14 3Z" fill="#0B1929"/><path d="M14 8L21 11.5V17.5L14 21L7 17.5V11.5L14 8Z" fill="#C9933A"/><path d="M14 11L18 13V17L14 19L10 17V13L14 11Z" fill="#0B1929"/></svg>
+      </div>
+      <div class="login-logo-text">
+        <div class="brand">AusBank</div>
+        <div class="sub">Unified Contact Centre Platform</div>
+      </div>
+    </div>
+    <div class="login-title">Agent Sign In</div>
+    <div class="login-subtitle">Access Digital Access Centre, Payment Monitoring, and your full agent toolkit from one workspace.</div>
+    <div class="login-error" id="loginError">Invalid credentials — try agent@ausbank.com.au / agent123</div>
+    <div class="field-group"><label>Email Address</label><input type="email" id="loginEmail" placeholder="agent@ausbank.com.au" value="agent@ausbank.com.au"/></div>
+    <div class="field-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" value="agent123"/></div>
+    <div class="field-group">
+      <label>Role</label>
+      <div class="role-row">
+        <div class="role-btn active" id="roleA" onclick="setRole('agent',this)"><span class="ri">🎧</span><span class="rl">Contact Agent</span></div>
+        <div class="role-btn" id="roleS" onclick="setRole('supervisor',this)"><span class="ri">👁</span><span class="rl">Supervisor</span></div>
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In to Workspace</button>
+    <div class="login-footer">AusBank Group © 2025 · <span onclick="showToast('📧','blue-toast','IT Support','itsupport@ausbank.com.au')">IT Support</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ APP SHELL ═══════════ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo-mark"><svg viewBox="0 0 28 28" fill="none"><path d="M14 3L25 8.5V19.5L14 25L3 19.5V8.5L14 3Z" fill="#0B1929"/><path d="M14 8L21 11.5V17.5L14 21L7 17.5V11.5L14 8Z" fill="#C9933A"/><path d="M14 11L18 13V17L14 19L10 17V13L14 11Z" fill="#0B1929"/></svg></div>
+    <div style="display:flex;flex-direction:column;gap:1px;cursor:default;">
+      <span class="logo-name">AusBank</span>
+      <span class="logo-sub">Contact Centre</span>
+    </div>
+    <div class="tb-div"></div>
+    <!-- VIEW SWITCHER -->
+    <div class="view-switcher">
+      <button class="vs-btn active" id="vs-digital" onclick="switchView('digital',this)">
+        <span class="vi">🎧</span> Digital Access <span class="vs-badge" id="daBadge">LIVE</span>
+      </button>
+      <button class="vs-btn" id="vs-payment" onclick="switchView('payment',this)">
+        <span class="vi">💳</span> Payment Monitoring <span class="vs-badge amber" id="pmBadge">4 ALERTS</span>
+      </button>
+    </div>
+    <div class="tb-div"></div>
+    <div class="call-badge"><div class="call-dot"></div>Live Call</div>
+    <div class="call-timer" id="callTimer">00:03:24</div>
+    <div class="cust-quick" id="cust-quick-block">
+      <div>
+        <div class="cust-quick-name" id="cqName">Marcus Henley</div>
+        <div class="cust-quick-id" id="cqId">CIF: 00429-AUS-17643 · Premier</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-clock" id="tbClock">09:41:22</div>
+      <div class="queue-pill" onclick="showToast('⏳','blue-toast','Queue Status','12 customers waiting · avg wait 4m 32s')">⏳ 12 in queue</div>
+      <div class="tb-icon-btn" onclick="showToast('🔔','amber-toast','Alerts','3 escalation alerts from Fraud team')">🔔</div>
+      <div class="tb-icon-btn" onclick="showToast('🔍','blue-toast','Search','Global search — coming Q3 2025')">🔍</div>
+      <div class="agent-pill" onclick="openLogoutModal()">
+        <div class="status-online"></div>
+        <div class="agent-av">SL</div>
+        <div class="agent-n">Sarah Liu · AGB-2241</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ VIEW 1: DIGITAL ACCESS CENTRE ═══════════ -->
+  <div class="view active" id="view-digital">
+    <div class="workspace">
+
+      <!-- LEFT: Customer 360 -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title-sm">Customer 360</span>
+          <span style="font-size:9px;background:var(--green2);color:var(--green);padding:2px 6px;border-radius:3px;border:1px solid rgba(61,184,122,.4);font-weight:700;">✓ VERIFIED</span>
+        </div>
+        <div class="panel-body">
+          <div class="cust-card">
+            <div class="cust-hdr">
+              <div class="cust-av">MH</div>
+              <div>
+                <div class="cust-name">Marcus Henley</div>
+                <div class="cust-id">CIF: 00429-AUS-17643</div>
+              </div>
+              <div class="risk-tag">HIGH RISK</div>
+            </div>
+            <div class="cust-grid">
+              <div class="cust-field"><label>Account</label><span>Everyday · ****4821</span></div>
+              <div class="cust-field"><label>Segment</label><span>Premier</span></div>
+              <div class="cust-field"><label>Mobile</label><span>+61 4XX XXX 812</span></div>
+              <div class="cust-field"><label>Member Since</label><span>Mar 2018</span></div>
+              <div class="cust-field"><label>State</label><span>Sydney, NSW</span></div>
+              <div class="cust-field"><label>NPS Score</label><span style="color:var(--amber)">42 / 100</span></div>
+              <div class="cust-field"><label>Balance</label><span>$12,841.50</span></div>
+              <div class="cust-field"><label>Last Txn</label><span>Today 08:14</span></div>
+            </div>
+          </div>
+          <div class="risk-block">
+            <div class="risk-lbl"><span>Fraud Risk Score</span><span class="risk-val" id="riskVal">74 / 100</span></div>
+            <div class="risk-bar"><div class="risk-fill" id="riskFill" style="width:74%"></div></div>
+          </div>
+          <div class="stats-row">
+            <div class="stat danger"><div class="stat-n" id="failCount">7</div><div class="stat-l">Login Fails</div></div>
+            <div class="stat warn"><div class="stat-n">3</div><div class="stat-l">Devices</div></div>
+            <div class="stat info"><div class="stat-n">2</div><div class="stat-l">OTP Sent</div></div>
+          </div>
+          <div class="sec-hdr">Digital Interaction Timeline</div>
+          <div id="tlMain">
+            <div class="tl-item"><div class="tl-icon info">📱</div><div><div class="tl-title">App Session Started</div><div class="tl-meta">09:41:02 · iOS 17.4 · iPhone 14 Pro · 5G</div></div></div>
+            <div class="tl-item"><div class="tl-icon fail">✕</div><div><div class="tl-title">Login Failed — Wrong Password</div><div class="tl-meta">09:41:18 · Attempt 1/5 · Sydney CBD</div></div></div>
+            <div class="tl-item"><div class="tl-icon fail">✕</div><div><div class="tl-title">Login Failed — Wrong Password</div><div class="tl-meta">09:41:45 · Attempt 2/5 · 27s after first</div></div></div>
+            <div class="tl-item"><div class="tl-icon warn">!</div><div><div class="tl-title">OTP Requested via SMS</div><div class="tl-meta">09:42:10 · Delivered · Optus 1.2s</div></div></div>
+            <div class="tl-item"><div class="tl-icon fail">✕</div><div><div class="tl-title">OTP Expired — Not Entered</div><div class="tl-meta">09:44:10 · 2-min TTL exceeded</div></div></div>
+            <div class="tl-item"><div class="tl-icon fail">✕</div><div><div class="tl-title">Login Failed — Soft Lock Applied</div><div class="tl-meta">09:44:28 · Attempt 3/5</div></div></div>
+            <div class="tl-item"><div class="tl-icon warn">⚠</div><div><div class="tl-title">New Device Detected</div><div class="tl-meta">09:46:01 · Android 14 · Samsung S24</div><span class="tl-badge new-dev">NEW DEVICE</span></div></div>
+            <div class="tl-item"><div class="tl-icon fail">✕</div><div><div class="tl-title">Biometric Auth Failed</div><div class="tl-meta">09:46:22 · Match score 0.12 / 0.85</div></div></div>
+            <div class="tl-item"><div class="tl-icon fail">🔒</div><div><div class="tl-title">Account Locked — All Channels</div><div class="tl-meta">09:47:05 · Max attempts reached</div><span class="tl-badge live">LIVE</span></div></div>
+          </div>
+          <div id="extraTimeline"></div>
+          <div class="sec-hdr" style="margin-top:14px;">Previous Interactions</div>
+          <div style="font-size:10px;color:var(--ts);line-height:1.7;">
+            <div style="padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:var(--td);font-family:var(--mono)">02 Apr</span> · Password reset — resolved ✓</div>
+            <div style="padding:4px 0;border-bottom:1px solid var(--border);"><span style="color:var(--td);font-family:var(--mono)">18 Mar</span> · Disputed transaction $249 — escalated</div>
+            <div style="padding:4px 0;"><span style="color:var(--td);font-family:var(--mono)">05 Jan</span> · Card replacement — resolved ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTRE: Event Stream -->
+      <div class="center-col">
+        <div class="alert-bar">
+          <div class="alert-icon-box">!</div>
+          <div class="alert-msg"><strong>ACCOUNT LOCKED</strong> — Marcus Henley exceeded maximum login attempts. Locked across all digital channels at 09:47:05 AEST. Verify identity before unlocking.</div>
+        </div>
+        <div class="summary-bar">
+          <div class="sum-pill"><div class="dot" style="background:var(--red)"></div>7 Auth Failures</div>
+          <div class="sum-pill"><div class="dot" style="background:var(--amber)"></div>1 New Device</div>
+          <div class="sum-pill"><div class="dot" style="background:var(--amber)"></div>1 OTP Expired</div>
+          <div class="sum-pill"><div class="dot" style="background:var(--blue)"></div>2 Sessions</div>
+          <div class="sum-pill"><div class="dot" style="background:var(--red)"></div>All Channels Locked</div>
+          <div class="sum-pill"><div class="dot" style="background:var(--td)"></div>Sydney CBD → Parramatta</div>
+        </div>
+        <div class="c-tabs">
+          <div class="c-tab active" onclick="switchCTab('events',this)">Event Stream</div>
+          <div class="c-tab" onclick="switchCTab('devices',this)">Device Intel</div>
+          <div class="c-tab" onclick="switchCTab('history',this)">Call History</div>
+          <div class="c-tab" onclick="switchCTab('fraud',this)">Fraud Signals</div>
+        </div>
+        <div class="live-feed-hdr"><div class="live-dot"></div><span class="live-text">Live Feed</span><span class="live-count" id="eventCount">8 events sourced from digital channels</span></div>
+        <!-- Events tab -->
+        <div class="c-tab-content active" id="ctab-events">
+          <div id="newEventsContainer"></div>
+          <div class="ev-card critical"><div class="ev-dot critical"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">AUTH_ACCOUNT_LOCKED</div><div class="ev-time">09:47:05</div></div><div class="ev-desc">Account locked after exceeding maximum failed authentication attempts. All digital channels suspended pending agent identity verification.</div><div class="ev-data">event_id: <span>EVT-9842</span> · channel: <span>mobile_app</span> · trigger: <span>max_attempts_exceeded</span> · lock_scope: <span>ALL_CHANNELS</span></div></div></div>
+          <div class="ev-card critical"><div class="ev-dot critical"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">AUTH_BIOMETRIC_FAIL</div><div class="ev-time">09:46:22</div></div><div class="ev-desc">Face ID / fingerprint authentication failed on new Android device. Biometric profile not enrolled on Samsung S24.</div><div class="ev-data">device_id: <span>AND-S24-9924</span> · match_score: <span>0.12</span> · threshold: <span>0.85</span> · result: <span>REJECTED</span></div></div></div>
+          <div class="ev-card warning"><div class="ev-dot warning"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">DEVICE_NEW_UNRECOGNISED</div><div class="ev-time">09:46:01</div></div><div class="ev-desc">Login attempted from an unrecognised Android device. Device fingerprint never associated with this customer account.</div><div class="ev-data">device: <span>Samsung Galaxy S24</span> · os: <span>Android 14</span> · ip: <span>203.29.XX.XX</span> · geo: <span>Parramatta NSW 2150</span></div></div></div>
+          <div class="ev-card critical"><div class="ev-dot critical"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">AUTH_SOFT_LOCK</div><div class="ev-time">09:44:28</div></div><div class="ev-desc">Soft lock applied after 3rd failed password attempt. 30-minute cooldown. Agent unlock available.</div><div class="ev-data">attempts_used: <span>3</span> · attempts_limit: <span>5</span> · cooldown_mins: <span>30</span> · lock_type: <span>SOFT</span></div></div></div>
+          <div class="ev-card warning"><div class="ev-dot warning"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">OTP_EXPIRED</div><div class="ev-time">09:44:10</div></div><div class="ev-desc">One-time passcode sent at 09:42:10 expired without being entered. 2-minute TTL exceeded.</div><div class="ev-data">otp_ref: <span>OTP-72841</span> · sent_to: <span>+61 4XX XXX 812</span> · ttl_seconds: <span>120</span> · status: <span>EXPIRED_UNUSED</span></div></div></div>
+          <div class="ev-card info"><div class="ev-dot info"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">OTP_REQUESTED</div><div class="ev-time">09:42:10</div></div><div class="ev-desc">Customer initiated OTP request via SMS. Passcode delivered to registered mobile via Optus network in 1.2s.</div><div class="ev-data">channel: <span>SMS</span> · carrier: <span>Optus</span> · latency_ms: <span>1200</span> · status: <span>DELIVERED</span></div></div></div>
+          <div class="ev-card critical"><div class="ev-dot critical"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">AUTH_PASSWORD_FAIL × 2</div><div class="ev-time">09:41:18 – 09:41:45</div></div><div class="ev-desc">Two consecutive password failures on primary iOS device, 27 seconds apart.</div><div class="ev-data">device_id: <span>IOS-14P-3381</span> · attempts: <span>[1,2]</span> · interval_secs: <span>27</span> · geo: <span>Sydney CBD NSW 2000</span></div></div></div>
+          <div class="ev-card info"><div class="ev-dot info"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">APP_SESSION_STARTED</div><div class="ev-time">09:41:02</div></div><div class="ev-desc">AusBank mobile app launched. Session initialised on iPhone 14 Pro. App on current version 4.8.2.</div><div class="ev-data">app_version: <span>4.8.2</span> · session_id: <span>SES-29104</span> · network: <span>5G</span> · vpn: <span>false</span></div></div></div>
+        </div>
+        <!-- Devices tab -->
+        <div class="c-tab-content" id="ctab-devices">
+          <div class="device-card"><div class="device-hdr"><div class="device-icon" style="background:var(--blue2)">📱</div><div><div class="device-name">iPhone 14 Pro</div><div class="device-sub">iOS 17.4 · App v4.8.2 · Primary device</div></div><div class="device-status trusted">TRUSTED</div></div><div class="device-grid"><div class="device-field"><label>Device ID</label><span>IOS-14P-3381</span></div><div class="device-field"><label>Last Login</label><span>Today 09:41</span></div><div class="device-field"><label>Location</label><span>Sydney CBD 2000</span></div><div class="device-field"><label>IP Address</label><span>101.182.XX.XX</span></div><div class="device-field"><label>Biometrics</label><span>Face ID enrolled</span></div><div class="device-field"><label>Registered</label><span>15 Mar 2022</span></div></div></div>
+          <div class="device-card" style="border-color:rgba(232,165,53,.3)"><div class="device-hdr"><div class="device-icon" style="background:var(--amber2)">📲</div><div><div class="device-name">Samsung Galaxy S24</div><div class="device-sub">Android 14 · Unregistered</div></div><div class="device-status unknown">UNKNOWN</div></div><div class="device-grid"><div class="device-field"><label>Device ID</label><span>AND-S24-9924</span></div><div class="device-field"><label>First Seen</label><span>Today 09:46</span></div><div class="device-field"><label>Location</label><span>Parramatta 2150</span></div><div class="device-field"><label>Distance</label><span>~23 km from primary</span></div></div><div style="margin-top:8px;display:flex;gap:6px;"><button class="btn-ghost-sm" onclick="showToast('🚩','amber-toast','Device Flagged','AND-S24-9924 flagged for fraud review')">🚩 Flag</button><button class="btn-ghost-sm" onclick="showToast('🚫','blue-toast','Device Blocked','Registration blocked for AND-S24-9924')">🚫 Block</button></div></div>
+        </div>
+        <!-- Call history tab -->
+        <div class="c-tab-content" id="ctab-history">
+          <div class="call-row"><div class="call-row-hdr"><div class="call-date">02 Apr 2025 · 14:22</div><div class="call-reason">Password Reset — Forgot credentials</div><div class="call-dur">6m 42s</div></div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div class="call-outcome resolved">RESOLVED</div><span style="font-size:10px;color:var(--td)">Agent: Priya Singh · AGB-1872</span></div><div class="call-notes">Customer forgot password after device upgrade. Verified KYC, issued temp password.</div></div>
+          <div class="call-row"><div class="call-row-hdr"><div class="call-date">18 Mar 2025 · 10:05</div><div class="call-reason">Disputed Transaction — $249.00</div><div class="call-dur">11m 18s</div></div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div class="call-outcome escalated">ESCALATED</div><span style="font-size:10px;color:var(--td)">Agent: Tom Crawford · AGB-2019</span></div><div class="call-notes">Unrecognised $249 debit. Customer denied. Escalated to Fraud — Case #FRD-8841.</div></div>
+          <div class="call-row"><div class="call-row-hdr"><div class="call-date">05 Jan 2025 · 09:44</div><div class="call-reason">Card Replacement — Lost/stolen</div><div class="call-dur">4m 55s</div></div><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div class="call-outcome resolved">RESOLVED</div><span style="font-size:10px;color:var(--td)">Agent: Sarah Liu · AGB-2241</span></div><div class="call-notes">Card reported lost. Previous card cancelled, replacement dispatched. ETA 3 business days.</div></div>
+        </div>
+        <!-- Fraud tab -->
+        <div class="c-tab-content" id="ctab-fraud">
+          <div class="ev-card warning"><div class="ev-dot warning"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">GEO_ANOMALY_DETECTED</div><div class="ev-time">09:46:01</div></div><div class="ev-desc">Login attempts from Sydney CBD and Parramatta within 5 minutes — 23km apart.</div><div class="ev-data">distance_km: <span>23</span> · time_diff_mins: <span>5</span> · risk_delta: <span>+18pts</span></div></div></div>
+          <div class="ev-card warning"><div class="ev-dot warning"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">VELOCITY_ANOMALY</div><div class="ev-time">09:41:18</div></div><div class="ev-desc">7 attempts in 6 minutes — normal is 1–2 per session. +483% above customer baseline.</div><div class="ev-data">attempts_today: <span>7</span> · avg_monthly: <span>1.2</span> · deviation: <span>+483%</span> · risk_delta: <span>+24pts</span></div></div></div>
+          <div style="background:var(--amber3);border:1px solid rgba(232,165,53,.3);border-radius:var(--r);padding:10px 12px;"><div style="font-size:10px;font-weight:700;color:var(--amber);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;">⚠ Escalation Threshold</div><div style="font-size:11px;color:var(--ts);line-height:1.5;">Risk score 74 + geo-anomaly + unrecognised device meets fraud escalation criteria.</div><button class="btn-ghost-sm" style="margin-top:8px;font-size:10px;" onclick="showToast('⬆','blue-toast','Escalated','Case sent to Fraud Operations')">Escalate to Fraud Team →</button></div>
+        </div>
+        <!-- Agent bar -->
+        <div class="agent-bar">
+          <div class="agent-bar-hdr"><label>Interaction Notes</label><span class="char-count" id="charCount">0 / 500</span></div>
+          <div class="input-row"><input class="agent-input" id="agentNote" placeholder="Log outcome, actions taken, escalation reason…" maxlength="500" oninput="updateCharCount()"/><button class="btn-primary-gold" onclick="addAgentNote()">Log Note</button></div>
+          <div class="quick-chips">
+            <div class="chip" onclick="fillNote('Identity verified via KYC — DOB, address and last transaction confirmed.')">✓ Identity verified</div>
+            <div class="chip" onclick="fillNote('Account unlocked across all digital channels via Agent Portal.')">🔓 Unlocked</div>
+            <div class="chip" onclick="fillNote('Temp password issued via SMS. 4-hour expiry.')">🔑 Temp pwd sent</div>
+            <div class="chip" onclick="fillNote('Samsung S24 — customer confirmed NOT their device. Blocked, flagged for fraud.')">🚩 Device flagged</div>
+            <div class="chip" onclick="fillNote('Escalated to Fraud Team — prior case FRD-8841 referenced.')">⬆ Escalated</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: AI Assist -->
+      <div class="ai-panel">
+        <div class="panel-hdr">
+          <span class="panel-title-sm">AI Assist</span>
+          <span style="font-size:9px;background:var(--gold4);color:var(--gold);padding:2px 6px;border-radius:3px;border:1px solid var(--gold3);font-weight:700;">AUTO-SURFACED</span>
+        </div>
+        <div class="panel-body">
+          <div class="sec-hdr">Recommended Actions</div>
+          <div class="action-card featured" id="ac1"><div class="action-hdr"><span class="action-tag high">URGENT</span><span class="action-title-text">Verify Identity &amp; Unlock</span></div><div class="action-desc">Complete 100-pt KYC then use Agent Portal → Security → Digital Unlock to restore access.</div><button class="action-done-btn" onclick="doneAction(this,'ac1')">Mark Complete ✓</button></div>
+          <div class="action-card" id="ac2"><div class="action-hdr"><span class="action-tag high">HIGH</span><span class="action-title-text">Confirm Samsung S24 Ownership</span></div><div class="action-desc">Unrecognised device in Parramatta, 23km from primary. Confirm or block accordingly.</div><button class="action-done-btn" onclick="doneAction(this,'ac2')">Mark Complete ✓</button></div>
+          <div class="action-card" id="ac3"><div class="action-hdr"><span class="action-tag med">MEDIUM</span><span class="action-title-text">Issue Temporary Password</span></div><div class="action-desc">After identity confirmed, issue temp password via SMS with 4-hour expiry window.</div><button class="action-done-btn" onclick="doneAction(this,'ac3')">Mark Complete ✓</button></div>
+          <div class="action-card" id="ac4"><div class="action-hdr"><span class="action-tag low">LOW</span><span class="action-title-text">Guide Biometric Re-enrolment</span></div><div class="action-desc">No biometrics on Android device — guide to Settings → Security → Fingerprint.</div><button class="action-done-btn" onclick="doneAction(this,'ac4')">Mark Complete ✓</button></div>
+          <div class="sec-hdr">Customer Sentiment</div>
+          <div class="sentiment-block">
+            <div style="font-size:9px;color:var(--td);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;">Voice Analysis — Current Call</div>
+            <div class="sent-row"><span style="color:var(--ts)">Frustration</span><span style="color:var(--red);font-weight:700;font-size:10px;">High</span></div>
+            <div class="sent-bar-wrap"><div class="sent-bar" style="width:78%;background:var(--red)"></div></div>
+            <div class="sent-row"><span style="color:var(--ts)">Cooperation</span><span style="color:var(--green);font-weight:700;font-size:10px;">Good</span></div>
+            <div class="sent-bar-wrap"><div class="sent-bar" style="width:65%;background:var(--green)"></div></div>
+            <div class="sent-row"><span style="color:var(--ts)">Churn Risk</span><span style="color:var(--amber);font-weight:700;font-size:10px;">Medium</span></div>
+            <div class="sent-bar-wrap"><div class="sent-bar" style="width:52%;background:var(--amber)"></div></div>
+            <div style="font-size:10px;color:var(--td);margin-top:5px;">💡 Acknowledge inconvenience, focus on fast resolution.</div>
+          </div>
+          <div class="sec-hdr">Channel Status</div>
+          <div class="channels-block">
+            <div class="ch-row"><div class="ch-icon" style="background:var(--red2)">📵</div><div style="flex:1"><div class="ch-name">Mobile App (iOS + Android)</div><div class="ch-detail">Both devices locked</div></div><div class="ch-status fail">LOCKED</div></div>
+            <div class="ch-row"><div class="ch-icon" style="background:var(--red2)">🌐</div><div style="flex:1"><div class="ch-name">Internet Banking</div><div class="ch-detail">web.ausbank.com.au</div></div><div class="ch-status fail">LOCKED</div></div>
+            <div class="ch-row"><div class="ch-icon" style="background:var(--green2)">📞</div><div style="flex:1"><div class="ch-name">Contact Centre</div><div class="ch-detail">In call · Active</div></div><div class="ch-status ok">ACTIVE</div></div>
+            <div class="ch-row"><div class="ch-icon" style="background:var(--blue2)">🏧</div><div style="flex:1"><div class="ch-name">Branch / ATM</div><div class="ch-detail">Card unaffected</div></div><div class="ch-status ok">OPEN</div></div>
+          </div>
+          <div class="sec-hdr">Knowledge Base</div>
+          <div class="kb-card"><div class="kb-title">Account Unlock — Agent Steps</div><ol class="kb-steps"><li>Complete 100-pt ID: DOB, home address, last transaction</li><li>Agent Portal → Customer → Security → Digital Unlock</li><li>Select scope: Mobile / Web / All Channels</li><li>Issue temp password via SMS — 4-hour window</li><li>Log outcome: reason code AUTH-UNLOCK-AGENT</li></ol></div>
+          <div class="kb-card fraud"><div class="kb-title">Fraud Escalation Criteria</div><ol class="kb-steps"><li>Customer denies unrecognised device → immediate escalation</li><li>Risk score > 80 → mandatory fraud referral</li><li>Geo-anomaly + velocity together → flag and escalate</li><li>Fraud Ops: ext. 7700 or JIRA Fraud Portal</li></ol></div>
+          <div style="height:12px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ VIEW 2: PAYMENT MONITORING ═══════════ -->
+  <div class="view" id="view-payment">
+    <div class="pv-shell">
+      <!-- Alert Banner -->
+      <div class="pv-banner" id="pv-banner">
+        <div class="pv-banner-left">
+          <div class="pv-banner-icon">⚠</div>
+          <div>
+            <div class="pv-banner-title">Critical Alert — Repeated Payment Failures Detected</div>
+            <div class="pv-banner-sub">Customer James O'Brien has failed 4 credit card transactions in the last 8 minutes · Immediate intervention required</div>
+          </div>
+        </div>
+        <button class="pv-connect-btn" onclick="pvConnectNow()">Connect with Customer →</button>
+      </div>
+      <!-- Layout -->
+      <div class="pv-layout" id="pv-layout">
+        <!-- Left: Customer List -->
+        <div class="pv-left">
+          <div class="pv-panel-hdr">
+            <span class="pv-panel-title">Active Monitoring</span>
+            <span class="pv-badge pv-badge-red" id="pvAlertBadge">4 Alerts</span>
+          </div>
+          <div class="pv-list" id="pvAlertsList"></div>
+        </div>
+        <!-- Right: Detail -->
+        <div class="pv-right" id="pvDetailPanel"></div>
+      </div>
+      <!-- Status Bar -->
+      <div class="pv-status-bar">
+        <div class="pv-status-items">
+          <span><span class="pv-sdot green"></span>Core Banking: Connected</span>
+          <span><span class="pv-sdot green"></span>CRM: Online</span>
+          <span><span class="pv-sdot red"></span>Payment Gateway: Degraded</span>
+          <span><span class="pv-sdot green"></span>CTI: Active</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;">Session: AUS-SYD-01 · <span id="pvSessionTime">00:00:00</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<!-- ═══════════ UNIFIED MODAL ═══════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-icon-circle green" id="modalIcon">📞</div>
+    <div class="modal-title" id="modalTitle">Confirm Action</div>
+    <div class="modal-body-text" id="modalBody">Are you sure?</div>
+    <div class="modal-actions-row">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal-confirm green" id="modalConfirmBtn" onclick="closeModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ UNIFIED TOAST ═══════════ -->
+<div class="toast-unified" id="toast">
+  <span class="toast-icon-el" id="toastIcon">✓</span>
+  <div class="toast-title-el" id="toastTitle">Done</div>
+  <div class="toast-body-el" id="toastBody"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// SHARED UTILITIES
+// ═══════════════════════════════════════════════════
+function showToast(icon, cls, title, body) {
+  // Supports both: showToast('msg','type') and showToast(icon,cls,title,body)
+  if (arguments.length <= 2) {
+    // simple 2-arg call: showToast(msg, type)
+    body = '';
+    title = icon;
+    cls = cls || 'info';
+    icon = cls === 'success' ? '✓' : cls === 'warning' ? '⚠' : cls === 'amber-toast' ? '⚠' : cls === 'red-toast' ? '!' : 'ℹ';
+  }
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastBody').textContent = body || '';
+  t.className = 'toast-unified ' + cls + ' show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function showModal(icon, iconClass, title, body, confirmLabel, onConfirm) {
+  const o = document.getElementById('modalOverlay');
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalIcon').className = 'modal-icon-circle ' + iconClass;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  const btn = document.getElementById('modalConfirmBtn');
+  btn.textContent = confirmLabel;
+  btn.className = 'btn-modal-confirm ' + (iconClass === 'blue' ? 'blue' : iconClass === 'red' ? 'red' : 'green');
+  btn.onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+  o.classList.add('show');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show', 'open'); }
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+function openLogoutModal() {
+  showModal('👤', 'blue', 'Sign Out', 'Are you sure you want to sign out? Your current call notes will be saved automatically.', 'Sign Out', doLogout);
+}
+
+// ═══════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════
+let userRole = 'agent';
+function setRole(r, el) {
+  userRole = r;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+function doLogin() {
+  const e = document.getElementById('loginEmail').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginError');
+  if (e === 'agent@ausbank.com.au' && p === 'agent123') {
+    err.style.display = 'none';
+    const ls = document.getElementById('loginScreen');
+    ls.style.opacity = '0'; ls.style.transition = 'opacity .4s';
+    setTimeout(() => {
+      ls.style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      startCallTimer();
+      startLiveEvents();
+      startClock();
+      pvInit();
+    }, 400);
+  } else {
+    err.style.display = 'block';
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+function doLogout() {
+  document.getElementById('app').classList.remove('visible');
+  const ls = document.getElementById('loginScreen');
+  ls.style.display = 'flex'; ls.style.opacity = '1';
+  secs = 204; pvSessionSecs = 0;
+}
+
+// ═══════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════
+function switchView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.vs-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Show/hide call info in topbar based on view
+  const cqb = document.getElementById('cust-quick-block');
+  const cTimer = document.querySelector('.call-timer');
+  const callBadge = document.querySelector('.call-badge');
+  if (id === 'digital') {
+    cqb.style.display = ''; cTimer.style.display = ''; callBadge.style.display = '';
+  } else {
+    cqb.style.display = 'none'; cTimer.style.display = 'none'; callBadge.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// DIGITAL ACCESS — CALL TIMER & TABS
+// ═══════════════════════════════════════════════════
+let secs = 204;
+function startCallTimer() {
+  setInterval(() => {
+    secs++;
+    const m = String(Math.floor(secs/60)).padStart(2,'0');
+    const s = String(secs%60).padStart(2,'0');
+    document.getElementById('callTimer').textContent = `00:${m}:${s}`;
+  }, 1000);
+}
+function switchCTab(id, el) {
+  document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.c-tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ctab-' + id).classList.add('active');
+}
+function updateCharCount() {
+  document.getElementById('charCount').textContent = `${document.getElementById('agentNote').value.length} / 500`;
+}
+function fillNote(text) { document.getElementById('agentNote').value = text; updateCharCount(); }
+function addAgentNote() {
+  const input = document.getElementById('agentNote');
+  const val = input.value.trim();
+  if (!val) return;
+  daLiveNoteCount = (daLiveNoteCount || 0) + 1;
+  const container = document.getElementById('newEventsContainer');
+  const t = new Date().toTimeString().slice(0,8);
+  const card = document.createElement('div');
+  card.className = 'ev-card success new';
+  card.innerHTML = `<div class="ev-dot agent"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name" style="color:var(--purple)">AGENT_NOTE_#${String(daLiveNoteCount).padStart(3,'0')}</div><div class="ev-time">${t}</div></div><div class="ev-desc">${val}</div><div class="ev-data">agent: <span>AGB-2241 — Sarah Liu</span> · channel: <span>voice_call</span></div></div>`;
+  container.insertBefore(card, container.firstChild);
+  // Ensure on events tab
+  document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.c-tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('.c-tab').classList.add('active');
+  document.getElementById('ctab-events').classList.add('active');
+  input.value = ''; updateCharCount(); updateEventCount();
+  showToast('✓','green-toast','Note Logged','Interaction note saved to call record');
+}
+let daLiveNoteCount = 0;
+function doneAction(btn, id) {
+  if (btn.classList.contains('done')) return;
+  btn.classList.add('done'); btn.textContent = '✓ Completed';
+  const card = document.getElementById(id);
+  card.style.opacity = '.4'; card.style.pointerEvents = 'none';
+  showToast('✓','green-toast','Action Complete','Marked as done');
+}
+let daEventCount = 8;
+function updateEventCount() { document.getElementById('eventCount').textContent = `${daEventCount} events sourced from digital channels`; }
+const daLiveEvts = [
+  {delay:7000,type:'warning',dc:'warning',name:'AUTH_SELF_SERVICE_ATTEMPT',desc:'Customer attempted self-service password reset via app while on hold. Reset blocked — account in full lock state.',data:'channel: <span>mobile_app</span> · reset_type: <span>self_service</span> · blocked_reason: <span>account_locked</span>'},
+  {delay:18000,type:'info',dc:'info',name:'IVR_NAVIGATION_EVENT',desc:'Customer navigated IVR: Main → Digital Banking → Login Issues before transfer. Total IVR time: 62 seconds.',data:'ivr_path: <span>Main → Digital → Login Issues</span> · duration_secs: <span>62</span>'},
+  {delay:32000,type:'success',dc:'success',name:'IDENTITY_VERIFICATION_PASSED',desc:'Customer confirmed identity via 100-point KYC. DOB, home address and last transaction verified. Cleared for account unlock.',data:'kyc_method: <span>agent_verbal</span> · points_score: <span>100</span> · verified_by: <span>AGB-2241</span> · status: <span>PASSED</span>'},
+];
+function startLiveEvents() {
+  daLiveEvts.forEach(ev => setTimeout(() => {
+    daEventCount++;
+    const t = new Date().toTimeString().slice(0,8);
+    const container = document.getElementById('newEventsContainer');
+    const card = document.createElement('div');
+    card.className = `ev-card ${ev.type} new`;
+    card.innerHTML = `<div class="ev-dot ${ev.dc}"></div><div style="flex:1"><div class="ev-hdr"><div class="ev-name">${ev.name}</div><div class="ev-time">${t}</div></div><div class="ev-desc">${ev.desc}</div><div class="ev-data">${ev.data}</div></div>`;
+    container.insertBefore(card, container.firstChild);
+    if (ev.type === 'success') {
+      const et = document.getElementById('extraTimeline');
+      const item = document.createElement('div');
+      item.className = 'tl-item'; item.style.animation = 'slideIn .3s ease-out';
+      item.innerHTML = `<div class="tl-icon ok">✓</div><div><div class="tl-title">Identity Verified by Agent</div><div class="tl-meta">${t} · KYC 100pts passed</div><span class="tl-badge ok">VERIFIED</span></div>`;
+      et.appendChild(item);
+    }
+    updateEventCount();
+  }, ev.delay));
+  setTimeout(() => {
+    document.getElementById('riskVal').textContent = '82 / 100';
+    document.getElementById('riskFill').style.width = '82%';
+    document.getElementById('failCount').textContent = '8';
+  }, 8000);
+}
+
+// ═══════════════════════════════════════════════════
+// SHARED CLOCK
+// ═══════════════════════════════════════════════════
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    document.getElementById('tbClock').textContent = t;
+    pvSessionSecs++;
+    const sh = String(Math.floor(pvSessionSecs/3600)).padStart(2,'0');
+    const sm = String(Math.floor((pvSessionSecs%3600)/60)).padStart(2,'0');
+    const ss = String(pvSessionSecs%60).padStart(2,'0');
+    const st = document.getElementById('pvSessionTime');
+    if (st) st.textContent = `${sh}:${sm}:${ss}`;
+  }
+  setInterval(tick, 1000); tick();
+}
+
+// ═══════════════════════════════════════════════════
+// PAYMENT MONITORING (from prep.html — full fidelity)
+// ═══════════════════════════════════════════════════
+const pvCustomers = [
+  {id:'c1',name:"James O'Brien",initials:"JO",account:"ACC-003-8820-01",bsb:"062-123",dob:"14 Mar 1982",phone:"+61 412 588 309",email:"j.obrien@gmail.com",address:"44 Harbour View Rd, Manly NSW 2095",joined:"12 Feb 2019",tier:"Gold",failures:4,severity:"critical",lastAttempt:"2 min ago",cardType:"Visa",cardNumber:"**** **** **** 7749",cardExpiry:"09/27",cardLimit:"AUD 15,000",cardAvailable:"AUD 14,840",avatarClass:"av-red",failureReason:"Insufficient credit / Gateway timeout",session:"APP-iOS",timeline:[{time:"09:38",type:"fail",label:"Payment Declined",amount:"AUD 285.00",merchant:"Amazon AU",error:"GATEWAY_TIMEOUT"},{time:"09:35",type:"fail",label:"Payment Declined",amount:"AUD 285.00",merchant:"Amazon AU",error:"CARD_DECLINED"},{time:"09:31",type:"fail",label:"Payment Declined",amount:"AUD 285.00",merchant:"Amazon AU",error:"CARD_DECLINED"},{time:"09:28",type:"fail",label:"Payment Declined",amount:"AUD 285.00",merchant:"Amazon AU",error:"CARD_DECLINED"},{time:"09:10",type:"ok",label:"Payment Approved",amount:"AUD 54.90",merchant:"Woolworths",error:null}]},
+  {id:'c2',name:"Priya Sharma",initials:"PS",account:"ACC-002-5541-09",bsb:"083-902",dob:"3 Sep 1990",phone:"+61 421 993 045",email:"priya.sharma@hotmail.com",address:"12B Collins St, Melbourne VIC 3000",joined:"7 Jul 2021",tier:"Silver",failures:2,severity:"warning",lastAttempt:"11 min ago",cardType:"Mastercard",cardNumber:"**** **** **** 3301",cardExpiry:"03/26",cardLimit:"AUD 8,000",cardAvailable:"AUD 421",avatarClass:"av-amber",failureReason:"Near credit limit",session:"Web Browser",timeline:[{time:"09:30",type:"fail",label:"Payment Declined",amount:"AUD 740.00",merchant:"JB Hi-Fi",error:"INSUFFICIENT_CREDIT"},{time:"09:27",type:"fail",label:"Payment Declined",amount:"AUD 740.00",merchant:"JB Hi-Fi",error:"INSUFFICIENT_CREDIT"},{time:"08:55",type:"ok",label:"Payment Approved",amount:"AUD 89.00",merchant:"Coles",error:null}]},
+  {id:'c3',name:"Michael Chen",initials:"MC",account:"ACC-007-1193-04",bsb:"036-447",dob:"22 Nov 1975",phone:"+61 430 114 782",email:"m.chen@chenlaw.com.au",address:"9 Queen St, Brisbane QLD 4000",joined:"5 Jan 2015",tier:"Platinum",failures:1,severity:"info",lastAttempt:"23 min ago",cardType:"Visa",cardNumber:"**** **** **** 5128",cardExpiry:"11/28",cardLimit:"AUD 50,000",cardAvailable:"AUD 36,110",avatarClass:"av-blue",failureReason:"Suspected fraud flag",session:"APP-Android",timeline:[{time:"09:18",type:"fail",label:"Payment Blocked",amount:"AUD 4,200.00",merchant:"Overseas Transfer",error:"FRAUD_SUSPECTED"},{time:"09:01",type:"ok",label:"Payment Approved",amount:"AUD 215.00",merchant:"Qantas",error:null}]},
+  {id:'c4',name:"Natalie Ross",initials:"NR",account:"ACC-001-6640-11",bsb:"082-157",dob:"8 Jun 1988",phone:"+61 407 882 215",email:"natalie.ross@icloud.com",address:"88 Rundle Mall, Adelaide SA 5000",joined:"14 Oct 2020",tier:"Silver",failures:1,severity:"info",lastAttempt:"31 min ago",cardType:"Mastercard",cardNumber:"**** **** **** 8894",cardExpiry:"07/26",cardLimit:"AUD 6,000",cardAvailable:"AUD 2,200",avatarClass:"av-blue",failureReason:"3DS authentication failure",session:"Web Browser",timeline:[{time:"09:10",type:"fail",label:"Auth Failure",amount:"AUD 319.00",merchant:"Catch.com.au",error:"3DS_FAILED"},{time:"08:40",type:"ok",label:"Payment Approved",amount:"AUD 120.00",merchant:"Dan Murphy's",error:null}]}
+];
+let pvSelectedId = 'c1';
+let pvResolvedIds = new Set();
+let pvSessionSecs = 0;
+
+function pvInit() {
+  pvRenderAlerts();
+  pvRenderDetail('c1');
+  // Simulate new failure after 12s
+  setTimeout(() => {
+    pvCustomers[0].failures = 5;
+    pvCustomers[0].lastAttempt = 'Just now';
+    pvCustomers[0].timeline.unshift({time:'09:40',type:'fail',label:'Payment Declined',amount:'AUD 285.00',merchant:'Amazon AU',error:'GATEWAY_TIMEOUT'});
+    pvRenderAlerts();
+    if (pvSelectedId === 'c1') pvRenderDetail('c1');
+    showToast('⚠','red-toast',"New Failure Detected","James O'Brien has now failed 5 payments.");
+    const banner = document.getElementById('pv-banner');
+    banner.style.animation = 'none';
+    void banner.offsetWidth;
+    banner.style.animation = '';
+    document.getElementById('pvAlertBadge').textContent = '5 Alerts';
+    document.getElementById('pmBadge').textContent = '5 ALERTS';
+  }, 12000);
+}
+
+function pvRenderAlerts() {
+  const list = document.getElementById('pvAlertsList');
+  list.innerHTML = '';
+  pvCustomers.forEach(c => {
+    const isActive = c.id === pvSelectedId;
+    const isResolved = pvResolvedIds.has(c.id);
+    const badgeAmber = c.severity !== 'critical';
+    const severityLabel = c.severity === 'critical' ? 'CRITICAL' : c.severity === 'warning' ? 'WARNING' : 'MONITOR';
+    const severityColor = c.severity === 'critical' ? 'var(--red)' : c.severity === 'warning' ? 'var(--amber)' : 'var(--blue-acc)';
+    const div = document.createElement('div');
+    div.className = `cust-alert-card ${c.severity} ${isActive ? 'active' : ''} ${isResolved ? 'resolved' : ''}`;
+    div.onclick = () => pvSelectCustomer(c.id);
+    div.innerHTML = `
+      <div class="card-top-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <div class="av-circle ${c.avatarClass}">${c.initials}</div>
+          <div class="card-name-block">
+            <div class="card-cname">${c.name}${isResolved ? ' <span style="font-size:10px;color:var(--green);font-weight:400">· Resolved</span>' : ''}</div>
+            <div class="card-acct">${c.account}</div>
+          </div>
+        </div>
+        <div class="fail-badge ${badgeAmber ? 'amber-bg' : ''}">
+          <span class="fc">${c.failures}</span>
+          <span class="fl">failed<br>attempt${c.failures>1?'s':''}</span>
+        </div>
+      </div>
+      <div class="card-meta-row">
+        <span class="meta-chip" style="color:${severityColor}">${isActive ? '<span class="pulse-dot'+(c.severity!=='critical'?' amber':'')+'"></span>' : ''}${severityLabel}</span>
+        <span class="meta-chip">${c.session}</span>
+        <span class="meta-chip">${c.lastAttempt}</span>
+        <span class="meta-chip" style="color:var(--td)">${c.tier}</span>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function pvRenderDetail(id) {
+  const c = pvCustomers.find(x => x.id === id);
+  if (!c) return;
+  const rp = document.getElementById('pvDetailPanel');
+  const isResolved = pvResolvedIds.has(c.id);
+  const failColor = c.failures >= 3 ? 'red' : c.failures >= 2 ? 'amber' : '';
+  const tierColor = (c.tier === 'Platinum' || c.tier === 'Gold') ? 'var(--gold)' : 'var(--ts)';
+  const tlHtml = c.timeline.map(t => `
+    <div class="pay-tl-item">
+      <div class="pay-tl-time">${t.time}</div>
+      <div class="pay-tl-dot-col"><div class="pay-tl-dot ${t.type}"></div><div class="pay-tl-line"></div></div>
+      <div>
+        <div class="pay-tl-title ${t.type}">${t.label}</div>
+        <div class="pay-tl-chips">
+          <span class="pay-tl-chip">${t.amount}</span>
+          <span class="pay-tl-chip">${t.merchant}</span>
+          ${t.error ? `<span class="pay-tl-chip err">${t.error}</span>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+  const scriptLine = c.severity === 'critical'
+    ? `"Good morning, this is Sarah from <strong>AusBank</strong>. May I speak with <strong>${c.name.split(' ')[0]}</strong>? We've noticed difficulty with a recent payment and we'd like to assist you immediately."`
+    : `"Hello, this is Sarah from <strong>AusBank</strong>. I'm reaching out to <strong>${c.name.split(' ')[0]}</strong> regarding a recent transaction. Could we take a moment to verify a few details?"`;
+  rp.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-top-row">
+        <div class="detail-cust-info">
+          <div class="detail-av ${c.avatarClass}">${c.initials}</div>
+          <div>
+            <div class="detail-name">${c.name} <span style="font-size:13px;color:${tierColor};font-weight:400">· ${c.tier}</span></div>
+            <div class="detail-subtitle">${c.account} &nbsp;·&nbsp; BSB ${c.bsb} &nbsp;·&nbsp; Joined ${c.joined}</div>
+          </div>
+        </div>
+        <div class="detail-actions-row">
+          ${isResolved
+            ? `<span style="color:var(--green);font-size:13px;font-weight:600">✓ Resolved</span>`
+            : `<button class="pv-btn pv-btn-ghost" onclick="pvSendSMS('${c.id}')">Send SMS</button>
+               <button class="pv-btn pv-btn-ghost" onclick="pvMarkResolved('${c.id}')">Mark Resolved</button>
+               <button class="pv-btn pv-btn-escalate" onclick="pvEscalate('${c.id}')">Escalate</button>
+               <button class="pv-btn pv-btn-call" onclick="pvCallCustomer('${c.id}')">📞 Call Now</button>`}
+        </div>
+      </div>
+      <div class="stat-strip">
+        <div class="stat-box"><div class="stat-label">Failed Attempts</div><div class="stat-value ${failColor}">${c.failures}</div><div class="stat-sub">Last: ${c.lastAttempt}</div></div>
+        <div class="stat-box"><div class="stat-label">Failure Reason</div><div class="stat-value" style="font-size:12px;line-height:1.3;color:var(--amber)">${c.failureReason}</div></div>
+        <div class="stat-box"><div class="stat-label">Card Available</div><div class="stat-value ${c.cardAvailable.includes('421')?'amber':''}">${c.cardAvailable}</div><div class="stat-sub">Limit: ${c.cardLimit}</div></div>
+        <div class="stat-box"><div class="stat-label">Active Session</div><div class="stat-value" style="font-size:12px;color:var(--blue-acc)">${c.session}</div><div class="stat-sub">Live in app</div></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="section-card">
+        <div class="section-label">Customer Details</div>
+        <div class="info-grid">
+          <div class="info-row"><span class="info-key">Full Name</span><span class="info-val">${c.name}</span></div>
+          <div class="info-row"><span class="info-key">Date of Birth</span><span class="info-val">${c.dob}</span></div>
+          <div class="info-row"><span class="info-key">Phone</span><span class="info-val mono">${c.phone}</span></div>
+          <div class="info-row"><span class="info-key">Email</span><span class="info-val" style="font-size:12px">${c.email}</span></div>
+          <div class="info-row" style="grid-column:1/-1"><span class="info-key">Address</span><span class="info-val">${c.address}</span></div>
+          <div class="info-row"><span class="info-key">Customer Tier</span><span class="info-val" style="color:${tierColor}">${c.tier}</span></div>
+          <div class="info-row"><span class="info-key">Member Since</span><span class="info-val">${c.joined}</span></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-label">Credit Card</div>
+        <div class="card-visual">
+          <div class="card-network">${c.cardType}</div>
+          <div class="card-number-vis">${c.cardNumber}</div>
+          <div class="card-bottom-row">
+            <div class="card-holder-name">${c.name}</div>
+            <div class="card-expiry-block"><div class="card-expiry-lbl">EXPIRES</div><div class="card-expiry">${c.cardExpiry}</div></div>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-row"><span class="info-key">Card Number</span><span class="info-val mono">${c.cardNumber}</span></div>
+          <div class="info-row"><span class="info-key">Card Type</span><span class="info-val">${c.cardType}</span></div>
+          <div class="info-row"><span class="info-key">Credit Limit</span><span class="info-val mono">${c.cardLimit}</span></div>
+          <div class="info-row"><span class="info-key">Available Credit</span><span class="info-val mono ${c.cardAvailable.includes('421')?'red':''}">${c.cardAvailable}</span></div>
+        </div>
+      </div>
+      ${!isResolved ? `
+      <div class="agent-prompt">
+        <div class="agent-prompt-title"><span class="agent-prompt-icon">🎙</span>Suggested Opening Script</div>
+        <div class="script-box">${scriptLine}</div>
+        <div class="prompt-actions">
+          <button class="pv-btn pv-btn-call" onclick="pvCallCustomer('${c.id}')">📞 Call Customer Now</button>
+          <button class="pv-btn pv-btn-primary" onclick="pvSendSMS('${c.id}')">Send SMS Alert</button>
+          <button class="pv-btn pv-btn-ghost" onclick="showToast('📋','blue-toast','Chat Transcript','Transcript loaded in CRM panel.')">View Transcript</button>
+          <button class="pv-btn pv-btn-ghost" onclick="showToast('📝','blue-toast','Notes','Agent notes panel opened.')">Add Notes</button>
+        </div>
+      </div>` : `
+      <div class="section-card" style="grid-column:1/-1;text-align:center;padding:28px;background:var(--green-faint);border-color:rgba(61,158,110,.3)">
+        <div style="font-size:28px;margin-bottom:8px">✓</div>
+        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px">Case Resolved</div>
+        <div style="font-size:13px;color:var(--td)">This customer's payment issue has been marked as resolved.</div>
+      </div>`}
+      <div class="section-card full-width">
+        <div class="section-label">Payment Attempt History <span style="font-weight:400;font-size:11px;color:var(--td)">today</span></div>
+        <div class="pay-timeline">${tlHtml}</div>
+      </div>
+    </div>`;
+}
+
+function pvSelectCustomer(id) {
+  pvSelectedId = id;
+  pvRenderAlerts();
+  pvRenderDetail(id);
+  // Update topbar customer quick-info
+  const c = pvCustomers.find(x => x.id === id);
+  if (c) {
+    document.getElementById('cqName').textContent = c.name;
+    document.getElementById('cqId').textContent = c.account + ' · ' + c.tier;
+  }
+}
+
+function pvCallCustomer(id) {
+  const c = pvCustomers.find(x => x.id === id);
+  showModal('📞', 'green', `Calling ${c.name}`, `Dialling <strong>${c.phone}</strong><br><br>This call will be recorded for quality and compliance purposes.`, 'Begin Call',
+    () => showToast('📞','green-toast','Call Initiated',`Connected to ${c.name.split(' ')[0]} at ${c.phone}`));
+}
+
+function pvSendSMS(id) {
+  const c = pvCustomers.find(x => x.id === id);
+  showModal('💬', 'blue', `Send SMS to ${c.name.split(' ')[0]}`, `An automated SMS will be sent to <strong>${c.phone}</strong> regarding their recent payment issue.`, 'Send SMS',
+    () => showToast('✓','green-toast','SMS Sent',`Message delivered to ${c.phone}`));
+}
+
+function pvEscalate(id) {
+  const c = pvCustomers.find(x => x.id === id);
+  showModal('⬆', 'blue', 'Escalate to Specialist', `Transfer ${c.name}'s case to the Payments Specialist team for urgent review. They will contact the customer within 15 minutes.`, 'Escalate Case',
+    () => showToast('⬆','blue-toast','Case Escalated',`${c.name}'s case sent to Payments Specialist queue`));
+}
+
+function pvMarkResolved(id) {
+  pvResolvedIds.add(id);
+  if (id === 'c1') {
+    document.getElementById('pv-banner').classList.add('hidden');
+  }
+  pvRenderAlerts();
+  pvRenderDetail(id);
+  showToast('✓','green-toast','Case Resolved','Payment issue marked as resolved.');
+  // Update badge counts
+  const remaining = pvCustomers.filter(c => !pvResolvedIds.has(c.id)).length;
+  document.getElementById('pvAlertBadge').textContent = `${remaining} Alert${remaining!==1?'s':''}`;
+  document.getElementById('pmBadge').textContent = `${remaining} ALERT${remaining!==1?'S':''}`;
+}
+
+function pvConnectNow() {
+  pvSelectCustomer('c1');
+  // Switch to payment view first (in case we're on digital)
+  switchView('payment', document.getElementById('vs-payment'));
+  pvCallCustomer('c1');
+}
+</script>
+</body>
+</html>
